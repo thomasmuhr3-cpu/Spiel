@@ -1,0 +1,4043 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Closer Academy — Voice Edition</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   CLOSER ACADEMY v3 — VOICE EDITION
+   Mobile-First · Sprachbasiert · Game-Design
+   Keine externen Abhängigkeiten · Nur Vanilla HTML/CSS/JS
+══════════════════════════════════════════════════════════════ */
+
+/* ── CSS VARIABLEN ── */
+:root {
+  --sky-top: #0a0f1e;
+  --sky-mid: #0d1b3e;
+  --sky-bottom: #112244;
+  --accent: #f9a826;
+  --accent-dark: #c67d08;
+  --accent-light: #ffd166;
+  --accent-glow: rgba(249,168,38,0.4);
+  --accent-bg: rgba(249,168,38,0.1);
+  --blue: #3b82f6;
+  --blue-glow: rgba(59,130,246,0.4);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.4);
+  --red: #ef4444;
+  --red-glow: rgba(239,68,68,0.4);
+  --purple: #8b5cf6;
+  --purple-glow: rgba(139,92,246,0.4);
+  --surface: rgba(255,255,255,0.06);
+  --surface2: rgba(255,255,255,0.1);
+  --surface3: rgba(255,255,255,0.15);
+  --border: rgba(255,255,255,0.12);
+  --border-bright: rgba(255,255,255,0.22);
+  --text: #f0f4ff;
+  --text-muted: #8ba4c8;
+  --text-dim: #4a6080;
+  --sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --display: Georgia, 'Times New Roman', serif;
+  --radius: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 15px; }
+
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: linear-gradient(160deg, var(--sky-top) 0%, var(--sky-mid) 50%, var(--sky-bottom) 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Sternenhimmel Hintergrund ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 40% 30%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 85% 10%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 92% 35%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 15% 50%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 30% 75%, rgba(255,200,100,0.4), transparent),
+    radial-gradient(1px 1px at 65% 80%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 48% 60%, rgba(255,255,255,0.5), transparent);
+  animation: starTwinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* ── Gradient Glow ── */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 60vh;
+  background: radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCREEN SYSTEM
+══════════════════════════════════════════════════════════════ */
+.screen {
+  display: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  z-index: 1;
+}
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════════════════════════════
+   SCREEN 1: STARTSCREEN / NISCHEN-AUSWAHL
+══════════════════════════════════════════════════════════════ */
+#screen-start {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 100px;
+  overflow-y: auto;
+}
+
+.start-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: fadeDown 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.start-icon {
+  font-size: 56px;
+  margin-bottom: 10px;
+  animation: floatIcon 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(249,168,38,0.6));
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.start-title {
+  font-family: var(--display);
+  font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-align: center;
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 50%, #ff8c00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px var(--accent-glow));
+}
+
+.start-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.start-desc {
+  max-width: 480px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 36px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px 24px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  animation: fadeUp 0.6s 0.3s both;
+}
+
+.start-desc strong { color: var(--accent); }
+
+/* ── Nischen-Auswahl ── */
+.setup-section {
+  width: 100%;
+  max-width: 540px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s 0.4s both;
+}
+
+.setup-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setup-label::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.niche-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.niche-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  backdrop-filter: blur(10px);
+}
+
+.niche-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.niche-card.selected {
+  border-color: var(--accent);
+  background: rgba(249,168,38,0.15);
+  box-shadow: 0 0 0 3px rgba(249,168,38,0.2), 0 8px 24px var(--accent-glow);
+}
+
+.niche-emoji { font-size: 26px; }
+
+.niche-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.niche-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ── Zielgruppe ── */
+.target-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.target-pill {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+
+.target-pill:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.target-pill.selected {
+  border-color: var(--blue);
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+  box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* ── Voice-Info ── */
+.voice-info {
+  width: 100%;
+  max-width: 540px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1));
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s 0.5s both;
+}
+
+.voice-info-icon { font-size: 24px; }
+
+.voice-info-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.voice-info-text strong { color: #6ee7b7; }
+
+/* ── Start Button ── */
+.btn-start {
+  width: 100%;
+  max-width: 380px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  color: #1a0a00;
+  border: none;
+  padding: 18px 32px;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--sans);
+  cursor: pointer;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 8px 32px var(--accent-glow);
+  animation: fadeUp 0.6s 0.6s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-start::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  border-radius: 50px;
+  pointer-events: none;
+}
+
+.btn-start:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 16px 40px var(--accent-glow);
+}
+
+.btn-start:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCREEN 2: GAMEPLAY (CHAT + VOICE)
+══════════════════════════════════════════════════════════════ */
+#screen-game {
+  flex-direction: column;
+  max-width: 740px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 0 120px;
+  gap: 0;
+}
+
+/* ── GAME HEADER ── */
+.game-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 16px;
+  background: rgba(10,15,30,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-name {
+  font-family: var(--display);
+  font-size: 15px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+.level-chip {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.mini-stat-label {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-size: 9px;
+}
+
+.mini-bar {
+  width: 60px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.mini-bar-fill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.fill-gold { background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+.fill-green { background: linear-gradient(90deg, var(--green), #34d399); }
+.fill-red { background: linear-gradient(90deg, var(--red), #f87171); }
+.fill-purple { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+
+.mini-val {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 24px;
+}
+
+.score-chip {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid rgba(249,168,38,0.3);
+  padding: 4px 10px;
+  border-radius: 50px;
+}
+
+.xp-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: #a78bfa;
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.25);
+  padding: 4px 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tts-btn-header {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tts-btn-header:hover { border-color: var(--purple); color: #a78bfa; }
+.tts-btn-header.active { border-color: var(--purple); color: #a78bfa; background: rgba(139,92,246,0.1); }
+
+/* Progress dots */
+.prog-dots { display: flex; gap: 5px; }
+.prog-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: all 0.3s;
+}
+.prog-dot.done { background: rgba(59,130,246,0.5); border-color: var(--blue); }
+.prog-dot.active { background: var(--accent); border-color: var(--accent-dark); box-shadow: 0 0 8px var(--accent-glow); transform: scale(1.4); }
+
+/* ── GAME BODY ── */
+.game-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 0;
+  gap: 12px;
+}
+
+/* ── Kunden-Karte ── */
+.customer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  backdrop-filter: blur(10px);
+  animation: slideDown 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.cust-avatar {
+  width: 50px; height: 50px;
+  background: var(--surface2);
+  border: 2px solid var(--border-bright);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cust-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.cust-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.cust-traits {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.trait {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text-muted);
+}
+.trait.warning { border-color: rgba(245,158,11,0.4); color: #fbbf24; }
+.trait.danger { border-color: rgba(239,68,68,0.4); color: #f87171; }
+.trait.positive { border-color: rgba(16,185,129,0.4); color: #34d399; }
+
+/* ── CHAT AREA ── */
+.chat-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 200px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+
+.chat-area::-webkit-scrollbar { width: 3px; }
+.chat-area::-webkit-scrollbar-track { background: transparent; }
+.chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 50px; }
+
+.msg {
+  display: flex;
+  gap: 8px;
+  animation: msgIn 0.3s ease both;
+}
+
+.msg.player { flex-direction: row-reverse; }
+.msg.system { justify-content: center; }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-ava {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.msg.player .msg-ava {
+  background: rgba(249,168,38,0.15);
+  border-color: rgba(249,168,38,0.4);
+}
+
+.msg-inner { display: flex; flex-direction: column; max-width: 75%; }
+.msg.player .msg-inner { align-items: flex-end; }
+
+.msg-who {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+}
+
+.msg.player .msg-who { color: var(--accent-dark); text-align: right; }
+
+.msg-bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.msg.customer .msg-bubble {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  color: var(--text);
+}
+
+.msg.player .msg-bubble {
+  background: linear-gradient(135deg, rgba(249,168,38,0.18), rgba(255,209,102,0.12));
+  border: 1px solid rgba(249,168,38,0.35);
+  border-bottom-right-radius: 4px;
+  color: #ffe599;
+  text-align: right;
+}
+
+/* Sprachbasierte Antwort — Badge */
+.msg.player .msg-bubble.voice-msg {
+  border-color: rgba(59,130,246,0.5);
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.08));
+  color: #93c5fd;
+}
+
+.msg.system .msg-bubble {
+  background: rgba(255,255,255,0.04);
+  border: 1px dashed rgba(255,255,255,0.12);
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 50px;
+  text-align: center;
+}
+
+/* Typing dots */
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 6px 2px;
+  align-items: center;
+}
+
+.typing-dot {
+  width: 6px; height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── VOICE INPUT MODUS ── */
+.voice-mode-area {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+
+.voice-mode-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-transcript {
+  min-height: 48px;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px dashed rgba(255,255,255,0.1);
+  transition: all 0.3s;
+  margin-bottom: 10px;
+}
+
+.voice-transcript.active {
+  border-color: rgba(59,130,246,0.4);
+  color: var(--text);
+  font-style: normal;
+  background: rgba(59,130,246,0.05);
+}
+
+.voice-transcript.listening {
+  border-color: rgba(239,68,68,0.5);
+  animation: recordPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
+
+/* ── CHOICES BEREICH (Klick-Modus) ── */
+.choices-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.choices-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.choice-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  animation: fadeUp 0.3s ease both;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-bg), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.choice-btn:hover::before { opacity: 1; }
+
+.choice-btn:hover {
+  border-color: rgba(249,168,38,0.4);
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.choice-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.choice-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  min-width: 20px;
+  padding-top: 1px;
+}
+
+.choice-quality-hint {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
+  color: var(--text-dim);
+}
+
+/* ── FEEDBACK PANEL ── */
+.feedback-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  animation: slideDown 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  backdrop-filter: blur(10px);
+}
+
+.fb-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.fb-quality-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid currentColor;
+}
+
+.fb-quality-badge.good { color: var(--green); background: rgba(16,185,129,0.1); }
+.fb-quality-badge.neutral { color: #fbbf24; background: rgba(251,191,36,0.1); }
+.fb-quality-badge.bad { color: var(--red); background: rgba(239,68,68,0.1); }
+
+.fb-deltas {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.delta-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 50px;
+  border: 1px solid currentColor;
+}
+.delta-tag.pos { color: var(--green); background: rgba(16,185,129,0.1); }
+.delta-tag.neg { color: var(--red); background: rgba(239,68,68,0.1); }
+
+.fb-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.fb-text strong { color: var(--text); }
+
+.fb-pro {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.fb-pro-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.fb-pro-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* AI Score Anzeige */
+.ai-score-panel {
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.08));
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.ai-score-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #a78bfa;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-score-label::before {
+  content: '✦';
+  font-size: 10px;
+}
+
+.ai-score-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-score-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.ai-score-bar {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.ai-score-fill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.ai-score-val {
+  font-size: 10px;
+  font-weight: 700;
+  color: #a78bfa;
+  min-width: 28px;
+  text-align: right;
+}
+
+.ai-feedback-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(139,92,246,0.15);
+}
+
+/* ── COACHING KATZE ── */
+.cat-card {
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.06));
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  animation: catPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes catPop {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cat-emo {
+  font-size: 36px;
+  flex-shrink: 0;
+  animation: catBob 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(139,92,246,0.3));
+}
+
+@keyframes catBob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+
+.cat-bubble { flex: 1; }
+
+.cat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cat-name-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cat-name { font-size: 13px; font-weight: 700; color: #a78bfa; }
+
+.cat-mood {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 50px;
+  border: 1px solid currentColor;
+}
+
+.cat-mood.great { color: var(--green); background: rgba(16,185,129,0.1); }
+.cat-mood.okay { color: #fbbf24; background: rgba(251,191,36,0.1); }
+.cat-mood.poor { color: var(--red); background: rgba(239,68,68,0.1); }
+
+.cat-tts-btn {
+  background: none;
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 50px;
+  padding: 3px 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a78bfa;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cat-tts-btn:hover { background: rgba(139,92,246,0.12); }
+.cat-tts-btn.speaking { background: rgba(139,92,246,0.2); animation: pulseBtn 1s ease-in-out infinite; }
+
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(139,92,246,0); }
+}
+
+.cat-rows { display: flex; flex-direction: column; gap: 6px; }
+
+.cat-row {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.cat-row-icon { flex-shrink: 0; font-size: 13px; }
+.cat-row strong { color: var(--text); font-weight: 600; }
+
+/* ── WEITER BUTTON ── */
+.btn-continue {
+  width: 100%;
+  background: linear-gradient(135deg, var(--blue), #60a5fa);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--sans);
+  cursor: pointer;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+  margin-top: 14px;
+}
+
+.btn-continue:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(59,130,246,0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FIXIERTER SPRECHEN-BUTTON (unten)
+══════════════════════════════════════════════════════════════ */
+.voice-dock {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 740px;
+  z-index: 200;
+  padding: 12px 16px 20px;
+  background: linear-gradient(0deg, rgba(10,15,30,0.98) 60%, transparent);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Sprechen Button — groß, rund, auffällig */
+.btn-speak {
+  flex: 1;
+  max-width: 320px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--red), #dc2626);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--sans);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 8px 32px rgba(239,68,68,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-speak::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  border-radius: 50px;
+  pointer-events: none;
+}
+
+.btn-speak:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 40px rgba(239,68,68,0.5);
+}
+
+.btn-speak.listening {
+  background: linear-gradient(135deg, #7f1d1d, var(--red));
+  animation: speakPulse 1s ease-in-out infinite;
+  box-shadow: 0 8px 32px rgba(239,68,68,0.6), 0 0 0 6px rgba(239,68,68,0.15);
+}
+
+@keyframes speakPulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(239,68,68,0.5), 0 0 0 0 rgba(239,68,68,0.3); }
+  50% { box-shadow: 0 8px 40px rgba(239,68,68,0.6), 0 0 0 12px rgba(239,68,68,0); }
+}
+
+.btn-speak:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  animation: none;
+  box-shadow: none;
+}
+
+.btn-speak-icon { font-size: 22px; }
+
+/* Klick-Modus Toggle */
+.btn-mode-toggle {
+  width: 48px;
+  height: 48px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.btn-mode-toggle:hover {
+  border-color: var(--border-bright);
+  background: var(--surface3);
+}
+
+.btn-mode-toggle.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LEVEL END SCREEN
+══════════════════════════════════════════════════════════════ */
+#screen-levelend {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.le-card {
+  max-width: 540px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 36px 32px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.le-result {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.le-result.win { color: var(--green); background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.4); }
+.le-result.lose { color: var(--red); background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); }
+
+.le-title {
+  font-family: var(--display);
+  font-size: 36px;
+  margin-bottom: 20px;
+  line-height: 1.15;
+}
+
+.le-stars {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.le-star {
+  width: 44px; height: 44px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  color: rgba(255,255,255,0.15);
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  background: rgba(255,255,255,0.04);
+}
+
+.le-star.earned {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.le-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.le-stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.le-stat-val {
+  font-family: var(--display);
+  font-size: 26px;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.le-stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.le-feedback { margin-bottom: 20px; }
+
+.le-fb-row {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.le-rankup {
+  background: rgba(249,168,38,0.1);
+  border: 1px solid rgba(249,168,38,0.3);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: none;
+  animation: rankPulse 2s ease-in-out infinite;
+}
+
+@keyframes rankPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249,168,38,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(249,168,38,0); }
+}
+
+.le-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-le-next {
+  flex: 1;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: #1a0a00;
+  border: none;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--sans);
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.btn-le-next:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px var(--accent-glow);
+}
+
+.btn-le-retry {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.2s;
+}
+
+.btn-le-retry:hover {
+  border-color: var(--border-bright);
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FINAL SCREEN
+══════════════════════════════════════════════════════════════ */
+#screen-final {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.final-crown {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: floatIcon 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(249,168,38,0.6));
+  display: block;
+  text-align: center;
+}
+
+.final-title {
+  font-family: var(--display);
+  font-size: clamp(36px, 8vw, 64px);
+  line-height: 1.1;
+  text-align: center;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent), #ff8c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px var(--accent-glow));
+}
+
+.final-sub {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.final-rank {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  border: 1px solid rgba(249,168,38,0.4);
+  padding: 12px 32px;
+  border-radius: 50px;
+  background: var(--accent-bg);
+  margin-bottom: 28px;
+  display: inline-block;
+  box-shadow: 0 0 24px var(--accent-glow);
+  animation: rankPulse 2.5s ease-in-out infinite;
+}
+
+.final-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 480px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.final-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 12px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.final-stat-val {
+  font-family: var(--display);
+  font-size: 28px;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.final-stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.btn-restart {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--sans);
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.2s;
+}
+
+.btn-restart:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAYS & EFFEKTE
+══════════════════════════════════════════════════════════════ */
+/* XP Levelup Overlay */
+#levelup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#levelup-overlay.show { opacity: 1; }
+
+.levelup-burst {
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--purple), #a78bfa);
+  padding: 22px 44px;
+  border-radius: 20px;
+  box-shadow: 0 8px 48px rgba(139,92,246,0.6);
+  transform: scale(0.5) rotate(-5deg);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  text-align: center;
+  line-height: 1.3;
+}
+
+#levelup-overlay.show .levelup-burst { transform: scale(1) rotate(0deg); }
+
+/* Flash-Effekte */
+.screen-flash-good { animation: flashG 0.6s ease-out forwards; }
+.screen-flash-bad { animation: flashR 0.6s ease-out forwards; }
+
+@keyframes flashG {
+  30% { background: rgba(16,185,129,0.06); }
+  100% { background: transparent; }
+}
+@keyframes flashR {
+  30% { background: rgba(239,68,68,0.06); }
+  100% { background: transparent; }
+}
+
+.choice-btn.correct {
+  border-color: rgba(16,185,129,0.5) !important;
+  background: rgba(16,185,129,0.08) !important;
+  animation: correctPop 0.5s ease-out;
+}
+
+.choice-btn.wrong {
+  border-color: rgba(239,68,68,0.5) !important;
+  animation: wrongShake 0.4s ease-out;
+}
+
+@keyframes correctPop {
+  0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+  50% { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-0.5deg); }
+  75% { transform: translateX(5px) rotate(0.5deg); }
+}
+
+/* AI Loading Spinner */
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.ai-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(139,92,246,0.2);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════════════════════
+   ALLGEMEINE ANIMATIONEN
+══════════════════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── MOBILE FIXES ── */
+@media (max-width: 500px) {
+  .header-stats { gap: 8px; }
+  .mini-bar { width: 44px; }
+  .le-stats { grid-template-columns: repeat(2, 1fr); }
+  .final-grid { grid-template-columns: repeat(2, 1fr); }
+  .niche-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 50px; }
+
+/* ══ BROWSER & HTTPS HINWEISE ══ */
+.nospeech-banner {
+  background: rgba(251,191,36,0.1);
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #fbbf24;
+  margin-bottom: 10px;
+  display: none;
+}
+.nospeech-banner.show { display: block; }
+
+/* ══ BROWSER-HINWEIS BANNER (Startscreen) ══ */
+.browser-hint {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 11px;
+  color: #93c5fd;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+  animation: fadeUp 0.6s 0.55s both;
+}
+.browser-hint-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.browser-hint strong { color: #bfdbfe; }
+
+/* ══ HTTPS WARNING ══ */
+.https-warning {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 11px;
+  color: #fca5a5;
+  margin-bottom: 14px;
+  display: none;
+  gap: 10px;
+  align-items: center;
+  animation: fadeUp 0.5s both;
+}
+.https-warning.show { display: flex; }
+
+/* ══ ROBUSTE SPRECHEN-TASTE ══ */
+.btn-speak {
+  flex: 1;
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  border: 2px solid #3b82f6;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 50px;
+  font-size: 17px;
+  font-weight: 800;
+  font-family: var(--sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 6px 24px rgba(59,130,246,0.4);
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  min-height: 58px;
+}
+
+.btn-speak::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  border-radius: 50px;
+  pointer-events: none;
+}
+
+.btn-speak:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 32px rgba(59,130,246,0.55);
+}
+
+.btn-speak:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Pulsierende Aufnahme-Animation */
+.btn-speak.listening {
+  background: linear-gradient(135deg, #7f1d1d, #dc2626) !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 4px rgba(239,68,68,0.2), 0 6px 24px rgba(239,68,68,0.4) !important;
+  animation: recPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(239,68,68,0.2), 0 6px 24px rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(239,68,68,0), 0 6px 32px rgba(239,68,68,0.55); }
+}
+
+.btn-speak:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ══ STATUS BADGE ══ */
+.speech-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 50px;
+  margin-bottom: 6px;
+  transition: all 0.3s;
+}
+
+.speech-status-badge.idle {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.speech-status-badge.listening {
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.35);
+}
+
+.speech-status-badge.done {
+  background: rgba(16,185,129,0.12);
+  color: #34d399;
+  border: 1px solid rgba(16,185,129,0.35);
+}
+
+.speech-status-badge.error {
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,0.3);
+}
+
+/* Blinkendes Aufnahme-Dot */
+.rec-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: recDotBlink 1s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes recDotBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* ══ MANUELLES TEXT-INPUT FALLBACK ══ */
+.manual-input-wrap {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.manual-input-wrap.show { display: flex; }
+
+.manual-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 14px;
+  resize: none;
+  height: 80px;
+  width: 100%;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+}
+
+.manual-input:focus {
+  outline: none;
+  border-color: var(--blue);
+  background: rgba(59,130,246,0.05);
+}
+
+.manual-input::placeholder { color: var(--text-dim); }
+
+.btn-manual-submit {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  border: none;
+  color: #1a0a00;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  align-self: flex-end;
+  transition: all 0.2s;
+}
+
+.btn-manual-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ══ MODE TOGGLE ══ */
+.btn-mode-toggle {
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  color: var(--text-muted);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-mode-toggle.active {
+  border-color: var(--blue);
+  color: #93c5fd;
+  background: rgba(59,130,246,0.12);
+}
+
+/* Closing-Moment Banner */
+.closing-banner {
+  background: linear-gradient(135deg, rgba(249,168,38,0.12), rgba(255,209,102,0.06));
+  border: 1px solid rgba(249,168,38,0.3);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+  animation: rankPulse 2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LEVEL-UP OVERLAY ══════════════ -->
+<div id="levelup-overlay">
+  <div class="levelup-burst" id="levelup-text">Level Up!</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 1: START / NISCHEN-AUSWAHL
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-start" class="screen active">
+  <div class="start-logo">
+    <div class="start-icon">🎯</div>
+    <h1 class="start-title">Closer Academy</h1>
+    <div class="start-subtitle">Voice Edition · v4.0 · KI Coach</div>
+  </div>
+
+  <p class="start-desc">
+    Führe <strong>echte Cold Calls</strong> per Sprache.
+    Dein KI-Coach bewertet jede Antwort sofort.<br>
+    5 Levels · Sprachsteuerung · Echtzeit-Feedback
+  </p>
+
+  <!-- Nischen-Auswahl -->
+  <div class="setup-section">
+    <div class="setup-label">Deine Branche / Nische</div>
+    <div class="niche-grid" id="niche-grid">
+      <button class="niche-card selected" data-niche="coaching" onclick="selectNiche(this)">
+        <span class="niche-emoji">🧠</span>
+        <span class="niche-name">Coaching</span>
+        <span class="niche-desc">Business- & Life-Coaching, Mentoring</span>
+      </button>
+      <button class="niche-card" data-niche="fitness" onclick="selectNiche(this)">
+        <span class="niche-emoji">💪</span>
+        <span class="niche-name">Fitness</span>
+        <span class="niche-desc">Personal Training, Online-Fitness</span>
+      </button>
+      <button class="niche-card" data-niche="marketing" onclick="selectNiche(this)">
+        <span class="niche-emoji">📣</span>
+        <span class="niche-name">Marketing</span>
+        <span class="niche-desc">Social Media, Ads, SEO, Branding</span>
+      </button>
+      <button class="niche-card" data-niche="saas" onclick="selectNiche(this)">
+        <span class="niche-emoji">💻</span>
+        <span class="niche-name">SaaS / Tech</span>
+        <span class="niche-desc">Software, Apps, IT-Lösungen</span>
+      </button>
+      <button class="niche-card" data-niche="finance" onclick="selectNiche(this)">
+        <span class="niche-emoji">💰</span>
+        <span class="niche-name">Finance</span>
+        <span class="niche-desc">Finanzberatung, Investments</span>
+      </button>
+      <button class="niche-card" data-niche="realestate" onclick="selectNiche(this)">
+        <span class="niche-emoji">🏠</span>
+        <span class="niche-name">Immobilien</span>
+        <span class="niche-desc">Makler, Investments, Verwaltung</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Zielgruppe -->
+  <div class="setup-section">
+    <div class="setup-label">Deine Zielgruppe</div>
+    <div class="target-pills">
+      <button class="target-pill selected" data-target="b2b" onclick="selectTarget(this)">B2B</button>
+      <button class="target-pill" data-target="b2c" onclick="selectTarget(this)">B2C</button>
+      <button class="target-pill" data-target="both" onclick="selectTarget(this)">Gemischt</button>
+    </div>
+  </div>
+
+  <!-- HTTPS Warnung (nur wenn nicht HTTPS/localhost) -->
+  <div class="https-warning" id="https-warning">
+    <span>⚠️</span>
+    <span><strong>Kein HTTPS erkannt:</strong> Mikrofonzugriff erfordert HTTPS oder localhost. Spracheingabe nicht verfügbar.</span>
+  </div>
+
+  <!-- Browser-Hinweis -->
+  <div class="browser-hint" id="browser-hint">
+    <span class="browser-hint-icon">💡</span>
+    <div>
+      <strong>Beste Nutzung in Google Chrome.</strong><br>
+      SpeechRecognition funktioniert zuverlässig nur in Chrome (Desktop/Android).
+      Safari & Firefox haben eingeschränkte oder keine Unterstützung.
+      <span id="browser-status-text"></span>
+    </div>
+  </div>
+
+  <!-- Voice-Info -->
+  <div class="voice-info">
+    <span class="voice-info-icon">🎙️</span>
+    <div class="voice-info-text">
+      <strong>Sprachbasiertes Training:</strong> Du antwortest per Mikrofon wie in einem echten Call.
+      Kein Mikrofon? Kein Problem – Text-Eingabe als Fallback.
+    </div>
+  </div>
+
+  <button class="btn-start" id="start-btn" onclick="startGame()">
+    🚀 Training starten
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 2: GAME
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+
+  <!-- HEADER -->
+  <header class="game-header">
+    <div class="header-brand">
+      <span class="brand-name">Closer Academy</span>
+      <span class="level-chip" id="level-chip">Level 1</span>
+      <div class="prog-dots" id="prog-dots"></div>
+    </div>
+    <div class="header-stats">
+      <div class="mini-stat">
+        <span class="mini-stat-label">Vertr.</span>
+        <div class="mini-bar">
+          <div class="mini-bar-fill fill-gold" id="bar-trust" style="width:50%"></div>
+        </div>
+        <span class="mini-val" id="val-trust">50</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-label">Chance</span>
+        <div class="mini-bar">
+          <div class="mini-bar-fill fill-green" id="bar-close" style="width:30%"></div>
+        </div>
+        <span class="mini-val" id="val-close">30</span>
+      </div>
+      <span class="score-chip" id="score-chip">0 Pkt.</span>
+      <span class="xp-chip">⚡ <span id="xp-val">0</span> XP</span>
+      <button class="tts-btn-header" id="tts-toggle" onclick="toggleTTS()">🔇 Stimme</button>
+    </div>
+  </header>
+
+  <!-- GAME BODY -->
+  <div class="game-body">
+
+    <!-- Kunden-Karte -->
+    <div class="customer-card" id="customer-card">
+      <div class="cust-avatar" id="cust-avatar">👤</div>
+      <div>
+        <div class="cust-name" id="cust-name">Kunde</div>
+        <div class="cust-meta" id="cust-meta">—</div>
+        <div class="cust-traits" id="cust-traits"></div>
+      </div>
+    </div>
+
+    <!-- No-Speech Banner -->
+    <div class="nospeech-banner" id="nospeech-banner">
+      ⚠️ Dein Browser unterstützt keine Spracheingabe. Nutze den Text-Modus oder wechsle zu Chrome.
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area" id="chat-area"></div>
+
+    <!-- Voice Mode Area -->
+    <div class="voice-mode-area" id="voice-mode-area" style="display:none">
+      <div class="voice-mode-label">
+        <!-- Dynamisches Status-Badge -->
+        <div class="speech-status-badge idle" id="speech-status-badge">
+          <span id="speech-status-icon">🎙️</span>
+          <span id="speech-status-text">Bereit</span>
+        </div>
+      </div>
+
+      <!-- Transcript-Anzeige -->
+      <div class="voice-transcript" id="voice-transcript">Klicke auf „Sprechen" und antworte wie im echten Call…</div>
+
+      <!-- Submit / Retry Buttons -->
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="btn-continue" id="voice-submit-btn" onclick="submitVoiceAnswer()" style="display:none;flex:1">
+          ✓ Antwort senden
+        </button>
+        <button class="btn-continue" id="voice-retry-btn" onclick="clearVoice()" style="display:none;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);box-shadow:none">
+          ↺ Neu sprechen
+        </button>
+      </div>
+
+      <!-- Manuelles Text-Fallback -->
+      <div class="manual-input-wrap" id="manual-input-wrap">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px">
+          ✏️ Text-Eingabe (Fallback)
+        </div>
+        <textarea class="manual-input" id="manual-input" placeholder="Tippe deine Antwort hier wie im echten Call…" maxlength="500"></textarea>
+        <button class="btn-manual-submit" onclick="submitManualAnswer()">Antwort senden →</button>
+      </div>
+    </div>
+
+    <!-- Choices Area (Klick-Modus) -->
+    <div class="choices-area" id="choices-area"></div>
+
+    <!-- Feedback Container -->
+    <div id="feedback-container"></div>
+
+    <!-- Cat Coach -->
+    <div id="cat-coach" style="display:none"></div>
+
+  </div>
+
+  <!-- VOICE DOCK (fixiert unten) -->
+  <div class="voice-dock" id="voice-dock">
+    <button class="btn-mode-toggle" id="mode-toggle-btn" onclick="toggleInputMode()" title="Zwischen Sprache und Text wechseln">
+      🖱️
+    </button>
+    <!-- Große Sprechen-Taste mit visuellem Feedback -->
+    <button class="btn-speak" id="speak-btn" onclick="toggleListening()" disabled>
+      <span class="btn-speak-icon" id="speak-icon">🎙️</span>
+      <span id="speak-btn-label">Sprechen</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 3: LEVEL END
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-levelend" class="screen">
+  <div class="le-card">
+    <div class="le-result" id="le-result">✓ Abschluss</div>
+    <h2 class="le-title" id="le-title">Gut gemacht!</h2>
+    <div class="le-stars" id="le-stars"></div>
+    <div class="le-stats">
+      <div class="le-stat">
+        <span class="le-stat-val" id="le-trust">–</span>
+        <span class="le-stat-label">Vertrauen</span>
+      </div>
+      <div class="le-stat">
+        <span class="le-stat-val" id="le-close">–</span>
+        <span class="le-stat-label">Abschluss%</span>
+      </div>
+      <div class="le-stat">
+        <span class="le-stat-val" id="le-score">–</span>
+        <span class="le-stat-label">Punkte</span>
+      </div>
+    </div>
+    <div class="le-feedback" id="le-feedback"></div>
+    <div class="le-rankup" id="le-rankup"></div>
+    <div class="le-buttons">
+      <button class="btn-le-retry" onclick="retryLevel()">↺ Nochmal</button>
+      <button class="btn-le-next" id="le-next-btn" onclick="nextLevel()">Weiter →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 4: FINAL
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-final" class="screen">
+  <span class="final-crown">🏆</span>
+  <h1 class="final-title">Training<br>Abgeschlossen!</h1>
+  <div class="final-sub">Du hast alle 5 Levels gemeistert</div>
+  <div class="final-rank" id="final-rank">Elite Closer</div>
+  <div class="final-grid" id="final-grid"></div>
+  <button class="btn-restart" onclick="restartGame()">↺ Nochmal starten</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════════════════════
+   KONFIGURATION
+══════════════════════════════════════════════════════════════ */
+
+// Nischen-Kontext für Dialoge
+const NICHE_CONTEXT = {
+  coaching: { label: 'Business-Coaching', product: 'Coaching-Programm', price: '4.900€', icon: '🧠' },
+  fitness:  { label: 'Personal Training',  product: 'Fitness-Programm',  price: '1.200€/Monat', icon: '💪' },
+  marketing:{ label: 'Marketing-Agentur',  product: 'Marketing-Paket',   price: '2.500€/Monat', icon: '📣' },
+  saas:     { label: 'SaaS-Software',      product: 'Software-Lösung',   price: '490€/Monat',   icon: '💻' },
+  finance:  { label: 'Finanzberatung',     product: 'Beratungspaket',    price: '3.000€',        icon: '💰' },
+  realestate:{ label: 'Immobilien',        product: 'Makler-Service',    price: 'Provision 3%', icon: '🏠' },
+};
+
+/* ══════════════════════════════════════════════════════════════
+   LEVEL-DATEN (nischen-adaptiert)
+   Die Kerndialoge sind gleich, aber Produkt/Preis wird ersetzt
+══════════════════════════════════════════════════════════════ */
+function getLevels(niche, target) {
+  const ctx = NICHE_CONTEXT[niche] || NICHE_CONTEXT.coaching;
+  const isB2B = target !== 'b2c';
+
+  return [
+    /* LEVEL 1: Opener & Interesse wecken */
+    {
+      id: 1,
+      customer: {
+        name: isB2B ? 'Michael Bauer' : 'Laura Klein',
+        meta: isB2B ? `CEO · ${ctx.label}-Interessent · München` : `Selbstständig · ${ctx.label}-Interessent · Hamburg`,
+        emoji: isB2B ? '👨‍💼' : '👩‍💼',
+        traits: [
+          { label: 'Neugierig', type: 'positive' },
+          { label: 'Beschäftigt', type: 'warning' },
+          { label: 'Skeptisch', type: '' }
+        ],
+        personality: 'Offen, aber will keinen Pitch hören'
+      },
+      trustStart: 45, closeStart: 20, levelScore: 0,
+      intro: 'Level 1 – Der erste Eindruck',
+      context: `${isB2B ? 'Michael' : 'Laura'} hat sich kurz registriert aber noch nichts gebucht. Du rufst jetzt an.`,
+      dialogue: [
+        {
+          id: 'start', speaker: 'customer',
+          text: `Hallo? Wer ist da? Ich hab gerade wenig Zeit.`,
+          choices: [
+            {
+              text: `Hallo ${isB2B ? 'Herr Bauer' : 'Laura'}! Ich bin kurz – Sie haben sich für unser ${ctx.product} interessiert. Eine Frage: Was hat Sie dazu gebracht, sich zu registrieren?`,
+              trust: +20, close: +15, quality: 'good', next: 'interest',
+              hint: 'Neugier wecken + Gegenfrage',
+              feedback: { good: 'Stark! Du hast respektiert, dass die Zeit knapp ist, und sofort eine Gegenfrage gestellt, die den Kunden öffnet.', pro: 'Die erste Frage ist entscheidend. Mach sie über den Kunden, nicht über dein Produkt.' }
+            },
+            {
+              text: `Guten Tag, ich rufe von der ${ctx.label} an und wollte kurz unser neues ${ctx.product} vorstellen...`,
+              trust: -5, close: 0, quality: 'neutral', next: 'interest',
+              hint: 'Klassischer Pitch – zu früh',
+              feedback: { good: 'Du hast sofort gepitcht. Der Kunde hat schon signalisiert, er hat wenig Zeit – das ignorierst du damit.', pro: 'Sprich zuerst über den Kunden, nicht über dein Produkt. "Was hat Sie bewogen..." öffnet mehr als "Ich wollte vorstellen..."' }
+            },
+            {
+              text: 'Oh sorry, schlechter Moment? Soll ich später nochmal anrufen?',
+              trust: -10, close: -15, quality: 'bad', next: 'interest',
+              hint: 'Initiative abgegeben',
+              feedback: { good: 'Du hast beim ersten Zeichen von Widerstand die Initiative abgegeben. Das ist nie die Lösung.', pro: 'Zeige, dass du respektierst dass er beschäftigt ist, bleib aber im Gespräch: "Ich bin in 30 Sekunden fertig – darf ich eine kurze Frage stellen?"' }
+            }
+          ]
+        },
+        {
+          id: 'interest', speaker: 'customer',
+          text: `Ja, ich hab das gesehen. Ehrlich gesagt weiß ich noch nicht ob das was für mich ist. Was macht Ihr ${ctx.product} besonders?`,
+          choices: [
+            {
+              text: `Gute Frage. Bevor ich das beantworte – was ist gerade Ihre größte Herausforderung, die Sie lösen möchten?`,
+              trust: +20, close: +20, quality: 'good', next: 'objection',
+              hint: 'Problem vor Lösung – Goldstandard',
+              feedback: { good: 'Exzellent! Du pitchst nicht – du fragst zuerst nach dem Problem. Das unterscheidet Top-Seller von jedem anderen.', pro: 'Niemals pitchen, bevor du das Problem kennst. Der Pitch muss zum Problem passen.' }
+            },
+            {
+              text: `Unser ${ctx.product} hat schon über 200 Kunden geholfen und wir bieten individuelle Betreuung und...`,
+              trust: +5, close: +5, quality: 'neutral', next: 'objection',
+              hint: 'Features-Pitch – zu früh, zu generisch',
+              feedback: { good: '"200 Kunden" ist Social Proof – gut. Aber du kennst noch nicht das Problem des Kunden. Features ohne Problem = kein Wert.', pro: 'Social Proof + spezifisches Problem = Überzeugung. Frag erst, dann zeige wie du exakt das Problem löst.' }
+            },
+            {
+              text: 'Wir haben die besten Ergebnisse am Markt und die meisten unserer Kunden sind sehr zufrieden...',
+              trust: -10, close: -10, quality: 'bad', next: 'objection',
+              hint: 'Marketingsprech ohne Substanz',
+              feedback: { good: '"Bestes" und "sehr zufrieden" ist leere Luft. Jeder sagt das. Du differenzierst dich mit nichts.', pro: 'Konkretheit schlägt Superlative. "Unser Kunde X hat in 6 Monaten Y erreicht" ist zehnmal stärker als "beste Ergebnisse".' }
+            }
+          ]
+        },
+        {
+          id: 'objection', speaker: 'customer',
+          text: `Klingt interessant. Aber ich hab so viele Anfragen bekommen – warum sollte ICH ausgerechnet mit Ihnen arbeiten?`,
+          choices: [
+            {
+              text: `Weil ich nicht hier bin, um Ihnen etwas zu verkaufen – sondern um herauszufinden, ob wir wirklich helfen können. Wenn nicht, sage ich Ihnen das direkt. Was ist denn das Größte, woran Sie gerade arbeiten?`,
+              trust: +25, close: +20, quality: 'good', next: 'close',
+              hint: 'Authentizität + Ehrlichkeit + Gegenfrage',
+              feedback: { good: 'Perfekt. Du hast das "Warum Sie?" mit Authentizität beantwortet und sofort wieder das Gespräch auf den Kunden gelenkt.', pro: 'Sei der Berater, nicht der Verkäufer. "Ich sag dir direkt wenn es nicht passt" baut mehr Vertrauen als jeder Pitch.' }
+            },
+            {
+              text: `Wir haben viele Testimonials und unsere Methode hat sich bewährt – ich kann Ihnen gerne Referenzen schicken.`,
+              trust: +5, close: -5, quality: 'neutral', next: 'close',
+              hint: 'Referenzen anbieten – zu früh, Initiative verloren',
+              feedback: { good: 'Referenzen zu schicken = du gibst die Kontrolle ab. Der Kunde entscheidet dann alleine, ohne dass du den Kontext setzt.', pro: 'Referenzen sind wertvoll, aber im Dialog. "Ich hab einen Kunden in ähnlicher Situation – darf ich kurz erzählen wie das gelaufen ist?"' }
+            },
+            {
+              text: 'Das ist eine gute Frage... wir haben halt viel Erfahrung und die meisten Kunden sind zufrieden.',
+              trust: -20, close: -20, quality: 'bad', next: 'close',
+              hint: 'Zögerlich, keine Differenzierung',
+              feedback: { good: 'Du hast auf "Warum Sie?" mit Zögern reagiert. Das ist das Schlimmste was passieren kann. Du musst diese Frage im Schlaf beantworten können.', pro: 'Trainiere deine Differenzierungsantwort bis sie sitzt. 30 Sekunden, kristallklar, ohne Zögern.' }
+            }
+          ]
+        },
+        {
+          id: 'close', speaker: 'customer',
+          text: `Okay, das macht Sinn. Wie würde der nächste Schritt aussehen?`,
+          isClosingMoment: true,
+          choices: [
+            {
+              text: `Super! Ich hätte diese Woche noch zwei Termine frei – Dienstag 14 Uhr oder Donnerstag 10 Uhr. Was passt Ihnen besser?`,
+              trust: +15, close: +30, quality: 'good', next: null,
+              levelEnd: { won: true }, hint: 'Alternative-Close – elegant & verbindlich',
+              feedback: { good: 'Der Alternative-Close ist ein Klassiker aus gutem Grund. Du fragst nicht ob, sondern wann. Präzise, respektvoll, effektiv.', pro: 'Gib immer zwei konkrete Optionen. Die Frage "Wann passt es Ihnen?" ohne Optionen endet im "Ich melde mich".' }
+            },
+            {
+              text: 'Ich schicke Ihnen alle Informationen per E-Mail zu, dann können Sie sich das in Ruhe anschauen.',
+              trust: -10, close: -20, quality: 'bad', next: null,
+              levelEnd: { won: false }, hint: 'Initiative komplett abgegeben',
+              feedback: { good: 'Der Kunde hat "Ja" signalisiert – du hast ihm die Tür für das Nein aufgemacht. E-Mails werden ignoriert, Kaufmomente verblassen.', pro: 'Wenn ein Kaufsignal kommt, handle sofort. Buche den Termin im Gespräch. "E-Mail zuerst" kostet dich 80% der Deals.' }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* LEVEL 2: Preis-Einwand */
+    {
+      id: 2,
+      customer: {
+        name: 'Sandra Lehmann',
+        meta: isB2B ? `Geschäftsführerin · ${ctx.label}-Interessentin · Hamburg` : `Unternehmerin · Selbstständig · Berlin`,
+        emoji: '👩‍💼',
+        traits: [
+          { label: 'Businessorientiert', type: 'positive' },
+          { label: 'Preis-sensitiv', type: 'warning' },
+          { label: 'Direkt', type: '' }
+        ],
+        personality: 'Sachlich, denkt in Zahlen, testet deinen Wert'
+      },
+      trustStart: 40, closeStart: 20, levelScore: 0,
+      intro: 'Level 2 – Der Preis-Einwand',
+      context: 'Sandra ist grundsätzlich interessiert, aber der Preis muss sich für sie rechnen.',
+      dialogue: [
+        {
+          id: 'start', speaker: 'customer',
+          text: `Ich hab Ihr Angebot gesehen. Direkte Frage: ${ctx.price} – das ist ganz schön viel. Warum sollte ich das ausgeben?`,
+          choices: [
+            {
+              text: `Gute Frage. Bevor ich das beantworte – was wäre der Unterschied in Ihrem Business, wenn Sie in den nächsten 6 Monaten das Ziel X erreichen würden?`,
+              trust: +20, close: +20, quality: 'good', next: 'roi',
+              hint: 'Wert vor Preis – ROI-Frage',
+              feedback: { good: 'Exzellent! Du hast den Preis-Einwand auf den ROI umgeleitet. Jetzt rechnet der Kunde selbst, ob es sich lohnt.', pro: 'Der Preis ist nur ein Problem, wenn der Wert unklar ist. Lass den Kunden den Wert selbst beziffern.' }
+            },
+            {
+              text: `Ich verstehe, dass der Preis hoch wirkt. Aber wir bieten wirklich sehr viel für das Geld...`,
+              trust: -5, close: 0, quality: 'neutral', next: 'roi',
+              hint: 'Defensiv & rechtfertigend',
+              feedback: { good: 'Wenn du dich für den Preis entschuldigst, verlierst du Autorität. Sandra testet, ob du hinter deinem Angebot stehst.', pro: `Stehe zum Preis. "${ctx.price} ist unser Preis, und er ist es wert – lassen Sie mich zeigen warum."` }
+            },
+            {
+              text: 'Wir können über den Preis reden, vielleicht gibt es Möglichkeiten...',
+              trust: -20, close: -15, quality: 'bad', next: 'roi',
+              hint: 'Sofortiger Preisnachlass-Signal',
+              feedback: { good: 'Fatal. Du hast bei der ersten Frage Verhandlungsbereitschaft signalisiert. Das zerstört deinen Wert komplett.', pro: 'Rabatte vor dem Wert = du akzeptierst, dass du zu teuer bist. Baue zuerst den Wert, dann verhandle wenn nötig.' }
+            }
+          ]
+        },
+        {
+          id: 'roi', speaker: 'customer',
+          text: 'Naja, ein gutes Ergebnis würde mir schon was bringen. Aber das ist ja noch nicht sicher.',
+          choices: [
+            {
+              text: `Genau. Wenn das Programm Ihnen hilft, auch nur ein konkretes Ziel zu erreichen, hat sich ${ctx.price} zigfach amortisiert. Das Risiko liegt nicht darin zu investieren – sondern es nicht zu tun.`,
+              trust: +25, close: +25, quality: 'good', next: 'objection2',
+              hint: 'ROI rechnen + Risiko umkehren',
+              feedback: { good: 'Brillant! Du hast das Risiko umgedreht. Jetzt fühlt sich das Nicht-Kaufen teurer an.', pro: 'Risk Reversal ist eine der stärksten Techniken. "Das Risiko ist nicht zu kaufen, sondern den Status quo zu behalten."' }
+            },
+            {
+              text: 'Sehen Sie, das ist ein guter Hinweis. Unser Programm hat da sehr gute Ergebnisse gezeigt.',
+              trust: +5, close: +5, quality: 'neutral', next: 'objection2',
+              hint: 'Vage, nicht überzeugend',
+              feedback: { good: 'Sandra denkt in Zahlen – du musst in Zahlen antworten. "Sehr gute Ergebnisse" ist nicht konkret genug.', pro: 'Businessorientierte Kunden brauchen Fakten: Durchschnittliche ROI, Case Studies mit konkreten Zahlen.' }
+            },
+            {
+              text: 'Ja, das stimmt, man weiß nie. Aber unser Programm macht Sie wahrscheinlich erfolgreicher.',
+              trust: -15, close: -10, quality: 'bad', next: 'objection2',
+              hint: 'Unsicherheit verstärkt + schwache Sprache',
+              feedback: { good: '"Wahrscheinlich" und "man weiß nie" sind Killer-Wörter. Du bestätigst das Risiko, statt es zu entkräften.', pro: 'Eliminiere Weich-Wörter: "vielleicht", "wahrscheinlich", "könnte". Ersetze durch "wird", "garantiert", "bewiesen".' }
+            }
+          ]
+        },
+        {
+          id: 'objection2', speaker: 'customer',
+          text: `Okay, der Gedanke macht Sinn. Aber ich hab das schon woanders probiert und war enttäuscht.`,
+          choices: [
+            {
+              text: `Das tut mir leid. Was war damals das größte Problem – was hat gefehlt, damit es funktioniert hätte?`,
+              trust: +20, close: +15, quality: 'good', next: 'final2',
+              hint: 'Empathie + Vergangenheit erkunden',
+              feedback: { good: 'Du hast Empathie gezeigt UND wertvolle Information gesammelt. Jetzt weißt du, wie du dich differenzieren kannst.', pro: 'Schlechte Vorerfahrungen sind Goldminen. Finde heraus was fehlte – und zeige dann, dass du genau das hast.' }
+            },
+            {
+              text: `Das war sicher nicht unser Programm. Wir sind fundamental anders aufgebaut...`,
+              trust: -10, close: 0, quality: 'neutral', next: 'final2',
+              hint: 'Defensiv, Empathie fehlt',
+              feedback: { good: 'Du hast den Mitbewerber sofort abgewertet, ohne die Kundin zu fragen was sie erlebt hat. Das wirkt arrogant.', pro: 'Erst verstehen, dann differenzieren. Validiere den Schmerz, bevor du deinen Vorteil zeigst.' }
+            },
+            {
+              text: 'Dann sind Sie natürlich vorsichtig, das verstehe ich total...',
+              trust: 0, close: -15, quality: 'bad', next: 'final2',
+              hint: 'Einwand bestätigt, kein Gegenpunkt',
+              feedback: { good: 'Du hast das Nein mit Verständnis bekräftigt, aber keinen Weg gezeigt, wie es dieses Mal anders wird.', pro: 'Bestätige den Schmerz kurz, dann schwenk sofort: "Deshalb machen wir X anders – darf ich zeigen wie?"' }
+            }
+          ]
+        },
+        {
+          id: 'final2', speaker: 'customer',
+          text: `Okay, das macht mir ehrlich gesagt mehr Mut. Wie läuft das ab, wenn man startet?`,
+          isClosingMoment: true,
+          choices: [
+            {
+              text: `Super. Wir starten mit einem 90-minütigen Strategie-Call, wo wir gemeinsam Ihre Situation analysieren und einen klaren Plan erstellen. Ich hätte übermorgen noch einen Slot – Vormittag oder Nachmittag?`,
+              trust: +20, close: +30, quality: 'good', next: null,
+              levelEnd: { won: true }, hint: 'Prozess erklären + Alternative-Close',
+              feedback: { good: 'Der Alternative-Close ("Vormittag oder Nachmittag?") ist elegant. Du fragst nicht ob, sondern wann.', pro: 'Never ask "Haben Sie Interesse?". Frag immer nach dem konkreten nächsten Schritt mit zwei Optionen.' }
+            },
+            {
+              text: `Das ist gut zu hören! Ich sende Ihnen die Vertragsunterlagen zu und dann können Sie in Ruhe entscheiden.`,
+              trust: 0, close: -15, quality: 'bad', next: null,
+              levelEnd: { won: false }, hint: 'Momentum verloren, Initiative abgegeben',
+              feedback: { good: 'Sie hatte gerade ein "Ja" signalisiert – du hast die Entscheidung in die Zukunft verschoben. Verkäufe sterben in der Zukunft.', pro: 'Wenn ein Kaufsignal kommt, handle sofort. Verträge in Ruhe lesen lässt den Kopf einspringen und das Herz abkühlen.' }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* LEVEL 3: Skeptischer Kunde */
+    {
+      id: 3,
+      customer: {
+        name: 'Dr. Thomas Richter',
+        meta: `Unternehmensberater · Selbstständig · Berlin`,
+        emoji: '🧐',
+        traits: [
+          { label: 'Analytisch', type: '' },
+          { label: 'Skeptisch', type: 'warning' },
+          { label: 'High Standards', type: 'danger' }
+        ],
+        personality: 'Stellt Fangfragen, will echte Substanz'
+      },
+      trustStart: 30, closeStart: 15, levelScore: 0,
+      intro: 'Level 3 – Der Skeptiker',
+      context: 'Dr. Richter ist Experte auf seinem Gebiet und testet dich mit gezielten Fragen.',
+      dialogue: [
+        {
+          id: 'start', speaker: 'customer',
+          text: `Ich bekomme täglich solche Anrufe. Überzeugen Sie mich in 30 Sekunden, warum ich nicht sofort auflegen sollte.`,
+          choices: [
+            {
+              text: `Weil ich nicht pitchen will – ich will wissen ob wir Ihnen überhaupt helfen können. Darf ich eine Frage stellen?`,
+              trust: +25, close: +20, quality: 'good', next: 'challenge',
+              hint: 'Musterbruch + Kontrolle übernehmen',
+              feedback: { good: 'Meisterhaft. Du hast das Muster gebrochen. Er erwartet einen Pitch – du fragst stattdessen. Das weckt Neugier.', pro: 'Das Muster zu brechen ist die stärkste Waffe gegen Skeptiker. Sei das Gegenteil von dem, was er erwartet.' }
+            },
+            {
+              text: `Wir sind die führende Lösung im Bereich ${ctx.label} und unsere Kunden erreichen messbare Ergebnisse...`,
+              trust: -10, close: -10, quality: 'bad', next: 'challenge',
+              hint: 'Klassischer Pitch – er hat das schon tausendmal gehört',
+              feedback: { good: 'Er hat genau das erwartet und du hast genau das geliefert. Du bist jetzt einer von "täglich solchen Anrufen".', pro: 'Wenn jemand sagt "überzeug mich in 30 Sekunden" – überzeuge nicht. Brich das Muster.' }
+            },
+            {
+              text: `Ja, ich verstehe, ich bin auch kurz. Wir haben eine einzigartige Methode...`,
+              trust: -5, close: -5, quality: 'neutral', next: 'challenge',
+              hint: 'Schwacher Start, sofort Pitch-Modus',
+              feedback: { good: '"Einzigartige Methode" ist eine leere Phrase. Jeder sagt das. Du bist nicht einzigartig, wenn du das sagst.', pro: 'Zeige Einzigartigkeit durch Verhalten, nicht durch Worte. Eine unerwartete Frage zeigt mehr als jeder Pitch.' }
+            }
+          ]
+        },
+        {
+          id: 'challenge', speaker: 'customer',
+          text: `Okay, fragen Sie. Aber Achtung – ich kenne alle Verkaufstricks. Wenn Sie eine Technik anwenden, erkenne ich das sofort.`,
+          choices: [
+            {
+              text: `Gut. Dann spreche ich nur in Klartext: Was ist gerade das größte Hindernis in Ihrem Business, das Sie nachts wachhält?`,
+              trust: +30, close: +20, quality: 'good', next: 'close3',
+              hint: 'Direkt + ehrlich + tiefe Frage',
+              feedback: { good: 'Du hast die Herausforderung angenommen. Keine Technik, keine Manipulation – nur eine ehrliche, tiefe Frage. Das respektiert er.', pro: 'Mit Experten und Skeptikern: Sei ehrlich bis zur Schonungslosigkeit. Sie respektieren Klarheit mehr als Pitch.' }
+            },
+            {
+              text: `Ha, das verstehe ich! Ich nutze auch keine Tricks – ich bin nur hier um zu helfen...`,
+              trust: -15, close: -10, quality: 'bad', next: 'close3',
+              hint: 'Defensiv + unglaubwürdig',
+              feedback: { good: '"Ich nutze keine Tricks" ist selbst eine Manipulationstechnik und er weiß das. Du verlierst sofort Glaubwürdigkeit.', pro: 'Nie sagen "Ich bin anders als die anderen". Zeige es durch Handlungen.' }
+            },
+            {
+              text: `Ich verstehe Ihre Skepsis – das ist berechtigt. Unsere Methode basiert auf Wissenschaft und...`,
+              trust: +5, close: +0, quality: 'neutral', next: 'close3',
+              hint: 'Okaye Reaktion aber sofort in Pitch-Modus',
+              feedback: { good: 'Du hast die Skepsis kurz anerkannt, aber dann sofort wieder gepitcht. Er beobachtet noch wie du reagierst.', pro: 'Lass ihn zuerst reden. Nach seinem "Ich erkenne Tricks" – frag ihn: "Was wäre für Sie ein wirklich gutes Gespräch?" Das disarmt ihn.' }
+            }
+          ]
+        },
+        {
+          id: 'close3', speaker: 'customer',
+          text: `Okay, das ist tatsächlich interessant. Sie reden anders als die meisten. Was würde ein erstes Gespräch mit Ihnen konkret bringen?`,
+          isClosingMoment: true,
+          choices: [
+            {
+              text: `In 45 Minuten analysieren wir gemeinsam Ihre Situation und Sie gehen mit 3 konkreten Erkenntnissen raus – egal ob Sie danach mit uns arbeiten oder nicht. Ich hätte Freitag 11 Uhr. Passt das?`,
+              trust: +25, close: +35, quality: 'good', next: null,
+              levelEnd: { won: true }, hint: 'Wert des Termins klar + kein Druck',
+              feedback: { good: '"Egal ob Sie danach mit uns arbeiten" – das ist disarmierend und baut massives Vertrauen. Du zeigst kein Verkaufs-Interesse.', pro: 'Value-First Closing: Der Termin selbst hat Wert. Wenn du das deutlich machst, sinkt die Abwehr auf null.' }
+            },
+            {
+              text: `Wir würden uns kennenlernen und schauen ob es eine Zusammenarbeit geben könnte.`,
+              trust: 0, close: -20, quality: 'bad', next: null,
+              levelEnd: { won: false }, hint: 'Kein Wert kommuniziert',
+              feedback: { good: '"Kennenlernen und schauen" ist für einen Skeptiker wie Richter wertlos. Er gibt seine Zeit nicht für Unklarheit.', pro: 'Sage konkret was er von dem Gespräch mitnimmt. Der Termin ist ein Produkt – verkaufe ihn.' }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* LEVEL 4: Emotionaler Einwand / "Muss drüber nachdenken" */
+    {
+      id: 4,
+      customer: {
+        name: 'Anna Fischer',
+        meta: `${isB2B ? 'Marketing-Managerin · GmbH' : 'Selbstständige Beraterin'} · Frankfurt`,
+        emoji: '👩‍🦰',
+        traits: [
+          { label: 'Emotional entscheidend', type: 'warning' },
+          { label: 'Sicherheitsorientiert', type: 'warning' },
+          { label: 'Nachdenklich', type: '' }
+        ],
+        personality: 'Trifft Entscheidungen nach Gefühl, braucht Sicherheit'
+      },
+      trustStart: 50, closeStart: 25, levelScore: 0,
+      intro: 'Level 4 – "Ich muss noch drüber nachdenken"',
+      context: 'Anna ist grundsätzlich interessiert, aber verschiebt die Entscheidung. Das ist eine emotionale Blockade.',
+      dialogue: [
+        {
+          id: 'start', speaker: 'customer',
+          text: `Ja, klingt gut... ich muss aber noch drüber nachdenken und mit meinem Partner besprechen.`,
+          choices: [
+            {
+              text: `Das ist völlig verständlich. Darf ich fragen – wenn Ihr Partner sofort Ja sagen würde, was würde Sie selbst noch zögern lassen?`,
+              trust: +25, close: +20, quality: 'good', next: 'realfear',
+              hint: 'Partner-Einwand isolieren + echte Blockade finden',
+              feedback: { good: 'Brilliant! Du hast den "Partner" als Ausflucht erkannt und mit einer cleveren Frage die echte Blockade gesucht.', pro: '"Partner besprechen" ist oft ein Schutzschild. Die echte Frage ist: Was hält SIE persönlich zurück?' }
+            },
+            {
+              text: `Klar, nehmen Sie sich Zeit! Melden Sie sich wenn Sie bereit sind.`,
+              trust: -10, close: -25, quality: 'bad', next: 'realfear',
+              hint: 'Entscheidung vollständig in die Zukunft verschoben',
+              feedback: { good: 'Du hast den Deal in die Zukunft geschoben. Entscheidungen, die nicht heute getroffen werden, werden nie getroffen.', pro: '"Melden Sie sich" = Du verlierst den Deal. Bleib im Gespräch und finde die echte Blockade.' }
+            },
+            {
+              text: `Was meinen Sie mit "drüber nachdenken"? Was sind Ihre Bedenken?`,
+              trust: +5, close: +5, quality: 'neutral', next: 'realfear',
+              hint: 'Direkt nachgehakt – okay aber zu kalt',
+              feedback: { good: 'Das direkte Nachfragen ist nicht falsch, aber klingt etwas druckvoll ohne vorherige Empathie.', pro: 'Erst Verständnis zeigen, dann nachfragen. "Das ist verständlich – was genau macht Sie noch unsicher?"' }
+            }
+          ]
+        },
+        {
+          id: 'realfear', speaker: 'customer',
+          text: `Ich glaube... ich hab Angst dass ich das Geld ausgebe und es nicht das bringt, was ich mir erhofft habe.`,
+          choices: [
+            {
+              text: `Das ist die ehrlichste Antwort, die ich heute gehört habe. Diese Angst ist berechtigt. Darf ich Ihnen zeigen, was wir konkret tun, damit diese Angst unbegründet wird?`,
+              trust: +30, close: +25, quality: 'good', next: 'close4',
+              hint: 'Angst würdigen + Kontrolle übernehmen',
+              feedback: { good: 'Du hast die Angst nicht abgetan, sondern gewürdigt. Das ist emotionale Intelligenz auf höchstem Niveau.', pro: 'Emotionale Einwände brauchen emotionale Antworten. Rationalisiere nicht – fühle mit und zeige dann den Weg.' }
+            },
+            {
+              text: `Das verstehe ich – aber schauen Sie sich mal unsere Erfolgsgeschichten an, da werden Sie sehen dass...`,
+              trust: -5, close: 0, quality: 'neutral', next: 'close4',
+              hint: 'Zu schnell in Logik-Modus gewechselt',
+              feedback: { good: 'Du hast einen emotionalen Einwand mit Logik beantwortet. Das funktioniert fast nie. Die Angst bleibt bestehen.', pro: 'Match the emotion first. Erst: "Das ist berechtigt" – dann: "Lass mich dir zeigen was das ändert."' }
+            },
+            {
+              text: `Diese Angst ist unbegründet – wir haben sehr hohe Erfolgsquoten und...`,
+              trust: -20, close: -15, quality: 'bad', next: 'close4',
+              hint: 'Angst abgetan – fatal',
+              feedback: { good: '"Unbegründet" zu sagen macht die Person, die die Angst hat, klein. Das ist respektlos und zerstört Vertrauen.', pro: 'Niemals Ängste als "unbegründet" bezeichnen. Die Angst des Kunden ist immer real für ihn.' }
+            }
+          ]
+        },
+        {
+          id: 'close4', speaker: 'customer',
+          text: `Okay... wenn ich ehrlich bin, klingt das gut. Aber kann ich noch eine Woche Zeit haben?`,
+          isClosingMoment: true,
+          choices: [
+            {
+              text: `Ich kann Ihnen eine Woche geben – aber darf ich fragen: Was wird sich in einer Woche ändern, das heute noch unklar ist? Wenn ich das beantworte, können wir jetzt entscheiden.`,
+              trust: +20, close: +30, quality: 'good', next: null,
+              levelEnd: { won: true }, hint: 'Zeit-Einwand hinterfragen + Angebot den Zweifel zu klären',
+              feedback: { good: 'Elite-Technik. Du lehnst nicht ab und gibst keine einfache Zustimmung. Du fragst nach dem echten Hindernis.', pro: '"Was ändert sich in X Tagen?" ist eine der wirkungsvollsten Closing-Fragen. Oft ist die Antwort: nichts.' }
+            },
+            {
+              text: `Natürlich! Kein Problem, nehmen Sie sich die Zeit die Sie brauchen.`,
+              trust: +5, close: -25, quality: 'bad', next: null,
+              levelEnd: { won: false }, hint: 'Keine Führung, Deal tot',
+              feedback: { good: 'Du hast die Entscheidung auf nächste Woche verschoben. Der Kaufimpuls ist verpufft. In einer Woche ist die Emotionalität weg und der Kopf übernimmt mit "Nein".', pro: 'Zeit-Einwände sind oft nur der Wunsch nach Sicherheit. Gib Sicherheit, keine Zeit.' }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* LEVEL 5: High-Ticket / Anspruchsvoller Kunde */
+    {
+      id: 5,
+      customer: {
+        name: 'Klaus Brenner',
+        meta: `Unternehmer · ${isB2B ? '8-stelliger Jahresumsatz' : 'High-Net-Worth-Individual'} · Zürich`,
+        emoji: '🦁',
+        traits: [
+          { label: 'Sehr anspruchsvoll', type: 'danger' },
+          { label: 'Direkt', type: 'warning' },
+          { label: 'High-Power', type: 'danger' }
+        ],
+        personality: 'Respektiert nur echte Stärke und Kompetenz'
+      },
+      trustStart: 25, closeStart: 10, levelScore: 0,
+      intro: 'Level 5 – Der Power-Kunde',
+      context: 'Klaus Brenner ist ein hocherfolgreicher Unternehmer. Er respektiert nur Stärke. Kein Zögern.',
+      dialogue: [
+        {
+          id: 'start', speaker: 'customer',
+          text: `Ich hab 10 Minuten. Was haben Sie zu sagen?`,
+          choices: [
+            {
+              text: `Ich brauche weniger. Eine Frage: Was ist gerade das eine Problem in Ihrem Business, das Sie am meisten kostet?`,
+              trust: +20, close: +15, quality: 'good', next: 'makebuy',
+              hint: 'Knapp, direkt, Frage stellen',
+              feedback: { good: 'Perfekt auf seinen Stil eingegangen. Kein Aufwärmen, keine Höflichkeiten – direkt auf das Wesentliche.', pro: 'High-Power-Kunden respektieren Effizienz. Komm sofort zum Punkt oder verliere sie.' }
+            },
+            {
+              text: `Danke für Ihre Zeit! Ich würde gerne unser ${ctx.product} vorstellen und...`,
+              trust: -15, close: -15, quality: 'bad', next: 'makebuy',
+              hint: '"Danke für Ihre Zeit" ist Schwäche',
+              feedback: { good: '"Danke für Ihre Zeit" signalisiert Dankbarkeit für etwas, das noch nicht getan wurde. Das macht dich klein.', pro: 'Nie für etwas danken, das noch nicht passiert ist. Beginne stark: "Gut. Eine Frage..."' }
+            },
+            {
+              text: `Gerne. Wir helfen Unternehmern wie Ihnen, bessere Ergebnisse zu erzielen – konkret...`,
+              trust: -5, close: 0, quality: 'neutral', next: 'makebuy',
+              hint: 'Pitch-Opener, zu generisch',
+              feedback: { good: '"Unternehmern wie Ihnen" ist Floskeln. Brenner will das Gefühl, dass du speziell ihn verstehst, nicht eine Kategorie.', pro: 'Personalisierung über Kategorisierung. Was macht ihn spezifisch aus? Frag danach.' }
+            }
+          ]
+        },
+        {
+          id: 'makebuy', speaker: 'customer',
+          text: `Ich hab Leute dafür intern. Warum sollte ich ${ctx.price} für Sie ausgeben?`,
+          choices: [
+            {
+              text: `Weil Ihre internen Leute bereits mit dem Tagesgeschäft beschäftigt sind. Ich bringe externen Blickwinkel, keine Betriebsblindheit, und Erfahrung aus Dutzenden ähnlicher Situationen. Das ist schlicht nicht intern replizierbar.`,
+              trust: +25, close: +25, quality: 'good', next: 'guarantee',
+              hint: 'Klare Differenzierung, keine Entschuldigung',
+              feedback: { good: 'Du hast ohne zu zögern differenziert. Klar, sachlich, ohne Entschuldigung. Genau das will Brenner hören.', pro: 'Make-or-Buy-Einwand: Trenne klar was extern Mehrwert schafft. Externer Blick, Netzwerk, Unabhängigkeit.' }
+            },
+            {
+              text: `Das stimmt, intern kann das auch funktionieren. Aber wir bringen zusätzliche Perspektiven...`,
+              trust: -20, close: -15, quality: 'bad', next: 'guarantee',
+              hint: 'Dem Kunden Recht geben = Deal verloren',
+              feedback: { good: 'Du hast zugestimmt, dass intern genauso gut funktioniert. Damit brauchst du dir den Rest sparen.', pro: 'Niemals dem Make-or-Buy zustimmen. Zeige klar was nur extern möglich ist.' }
+            },
+            {
+              text: `Wir haben eine bewährte Methode, die intern schwer aufzubauen ist...`,
+              trust: +5, close: +5, quality: 'neutral', next: 'guarantee',
+              hint: 'Zu vage für Brenner',
+              feedback: { good: '"Bewährte Methode" ist nichts Konkretes. Brenner braucht handfeste Argumente.', pro: 'Konkretheit gewinnt. Spezifische Case Studies mit Zahlen statt vager Methoden-Beschreibung.' }
+            }
+          ]
+        },
+        {
+          id: 'guarantee', speaker: 'customer',
+          text: `Was passiert wenn Sie die Ergebnisse nicht liefern?`,
+          choices: [
+            {
+              text: `Dann ist das mein Problem. Ich biete eine Performance-Garantie: Erreichen wir die Meilensteine nicht, arbeite ich kostenfrei weiter. Ich stehe mit meinem Ruf dafür ein.`,
+              trust: +30, close: +30, quality: 'good', next: 'close5',
+              hint: 'Vollständige Risikoübernahme',
+              feedback: { good: 'Du hast das Risiko komplett übernommen. Das ist das höchste Niveau der Selbstsicherheit.', pro: 'Skin in the Game: Wenn du selbst Risiko übernimmst, beweist du Überzeugung. Das überträgt sich.' }
+            },
+            {
+              text: `Wir tun natürlich unser Bestes und haben bisher gute Ergebnisse geliefert...`,
+              trust: -10, close: -10, quality: 'neutral', next: 'close5',
+              hint: 'Ausweichen, keine Konsequenz',
+              feedback: { good: 'Brenner wollte wissen was passiert wenn nicht. "Unser Bestes" ist keine Antwort.', pro: 'Klare Konsequenzen stärken Vertrauen. Wenn keine Garantie möglich ist, gib einen klaren Eskalationsplan.' }
+            },
+            {
+              text: 'Das ist natürlich möglich... in dem Fall würden wir das besprechen.',
+              trust: -25, close: -20, quality: 'bad', next: 'close5',
+              hint: 'Zögerlich, kein Commitment',
+              feedback: { good: 'Du hast gerade gestanden, dass du das Risiko nicht trägst. Für Brenner bist du damit raus.', pro: 'Mit High-Power-Kunden: Stehe für deine Ergebnisse ein. Ohne klares Commitment kein Vertrauen, kein Deal.' }
+            }
+          ]
+        },
+        {
+          id: 'close5', speaker: 'customer',
+          text: `Sie reden anders als die meisten. Ich nehme mir die Woche um zu entscheiden. Was brauchen Sie?`,
+          isClosingMoment: true,
+          choices: [
+            {
+              text: `Eine Entscheidung bis Freitag – nicht wegen Druck, sondern weil ich dann Kapazität für einen anderen Kunden freigeben muss. Was brauchen SIE von mir, um bis Freitag sicher zu sein?`,
+              trust: +20, close: +35, quality: 'good', next: null,
+              levelEnd: { won: true }, hint: 'Echte Dringlichkeit + Gegenfrage',
+              feedback: { good: 'Meisterhaft. Echte Dringlichkeit ohne Fake-Druck, Wertigkeit zeigen, und die Gegenfrage gibt dem Kunden Kontrolle.', pro: 'Elite Closing: Wertigkeit zeigen, echten Druck aufbauen, und den Kunden fragen was er braucht um sicher zu sein.' }
+            },
+            {
+              text: `Natürlich, nehmen Sie sich die Zeit! Ich warte auf Ihre Entscheidung.`,
+              trust: 0, close: -20, quality: 'bad', next: null,
+              levelEnd: { won: false }, hint: 'Keine Dringlichkeit, Führung abgegeben',
+              feedback: { good: 'Nach diesem starken Gespräch hast du am Ende die Führung abgegeben.', pro: 'Elite Closer führen bis zum Ende. Auch High-Power-Kunden wollen geführt werden – sie respektieren Standhaftigkeit.' }
+            }
+          ]
+        }
+      ]
+    }
+  ];
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════════════════════════ */
+const state = {
+  niche: 'coaching',
+  target: 'b2b',
+  currentLevel: 0,
+  trust: 50,
+  closeChance: 25,
+  totalScore: 0,
+  levelScore: 0,
+  levelResults: [],
+  currentRank: 0,
+  ranks: ['Newcomer', 'Performer', 'Senior Closer', 'Top Closer', 'Elite Closer ★'],
+  dialogueMap: {},
+  LEVELS: [],
+  // XP
+  xp: 0,
+  playerLevel: 1,
+  xpThreshold: 100,
+  // TTS
+  ttsEnabled: false,
+  // Sprache
+  listening: false,
+  voiceMode: true,  // true = Spracheingabe, false = Klick-Modus
+  recognition: null,
+  currentNode: null,
+  transcript: '',
+  speechSupported: false,
+};
+
+/* ══════════════════════════════════════════════════════════════
+   AUDIO FEEDBACK
+══════════════════════════════════════════════════════════════ */
+function playTone(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    if (type === 'good') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.07, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    } else if (type === 'bad') {
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'levelup') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+        o2.connect(g2); g2.connect(ctx.destination);
+        o2.frequency.value = f;
+        g2.gain.setValueAtTime(0.07, ctx.currentTime + i * 0.12);
+        g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.2);
+        o2.start(ctx.currentTime + i * 0.12);
+        o2.stop(ctx.currentTime + i * 0.12 + 0.25);
+      });
+    }
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCREEN MANAGEMENT
+══════════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NISCHE & ZIELGRUPPE AUSWAHL
+══════════════════════════════════════════════════════════════ */
+function selectNiche(el) {
+  document.querySelectorAll('.niche-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.niche = el.dataset.niche;
+}
+
+function selectTarget(el) {
+  document.querySelectorAll('.target-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.target = el.dataset.target;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SPEECH RECOGNITION — ROBUSTE IMPLEMENTIERUNG v4
+   ──────────────────────────────────────────────────────────────
+   WARUM ES VORHER NICHT ZUVERLÄSSIG WAR:
+   1. Keine saubere Fehlerbehandlung bei abgebrochenem rec.start()
+   2. Kein Schutz gegen doppelte start()-Aufrufe (InvalidStateError)
+   3. continuous=false führt zu ungewollten Neustarts
+   4. Keine HTTPS-Erkennung (Mikro verweigert silently)
+   5. Keine Unterscheidung zwischen interimResults und final
+
+   SICHER FUNKTIONIERT ES IN:
+   ✅ Google Chrome (Desktop & Android) — empfohlen
+   ⚠️  Safari (macOS/iOS) — teilweise unterstützt
+   ❌ Firefox — NICHT unterstützt
+   ❌ Chrome auf iOS — NICHT unterstützt (WebKit-Beschränkung)
+══════════════════════════════════════════════════════════════ */
+
+function checkEnvironment() {
+  // HTTPS-Check: Mikrofon nur über HTTPS oder localhost möglich
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isSecure) {
+    const warn = document.getElementById('https-warning');
+    if (warn) warn.classList.add('show');
+    console.warn('[Speech] ⚠️ Kein HTTPS — Mikrofonzugriff wird vom Browser blockiert.');
+  }
+
+  // Browser-Erkennung für Hinweis-Text
+  const ua = navigator.userAgent;
+  const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua) && !/OPR/.test(ua);
+  const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
+  const isFirefox = /Firefox/.test(ua);
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+
+  const statusEl = document.getElementById('browser-status-text');
+  if (statusEl) {
+    if (isChrome && !isIOS) {
+      statusEl.textContent = ' ✅ Du nutzt Chrome – optimal!';
+      statusEl.style.color = '#34d399';
+    } else if (isSafari) {
+      statusEl.textContent = ' ⚠️ Safari: eingeschränkte Unterstützung.';
+      statusEl.style.color = '#fbbf24';
+    } else if (isFirefox) {
+      statusEl.textContent = ' ❌ Firefox: SpeechRecognition nicht verfügbar.';
+      statusEl.style.color = '#f87171';
+    } else if (isIOS) {
+      statusEl.textContent = ' ❌ iOS Chrome: Spracheingabe nicht verfügbar.';
+      statusEl.style.color = '#f87171';
+    }
+  }
+
+  return { isSecure, isChrome, isSafari, isFirefox, isIOS };
+}
+
+function initSpeech() {
+  console.log('[Speech] 🚀 initSpeech() aufgerufen');
+
+  // SpeechRecognition API — Chrome: webkitSpeechRecognition, Standard: SpeechRecognition
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) {
+    // FALLBACK: Kein SpeechRecognition verfügbar
+    console.warn('[Speech] ❌ SpeechRecognition nicht unterstützt — aktiviere Text-Fallback');
+    state.speechSupported = false;
+
+    // Nospeech-Banner anzeigen
+    const banner = document.getElementById('nospeech-banner');
+    if (banner) banner.classList.add('show');
+
+    // Automatisch Text-Modus aktivieren
+    state.voiceMode = false;
+    updateVoiceDock();
+    return;
+  }
+
+  state.speechSupported = true;
+  console.log('[Speech] ✅ SpeechRecognition verfügbar — initialisiere...');
+
+  // ── Recognition-Instanz erstellen ──
+  // WICHTIG: Neue Instanz pro Aufnahme ist stabiler als Wiederverwendung
+  // weil onend/onerror-States manchmal korrumpiert werden
+  function createRecognition() {
+    const rec = new SR();
+
+    // Deutsch als Sprache setzen
+    rec.lang = 'de-DE';
+
+    // continuous=false: Stoppt automatisch nach Sprachpause → stabiler
+    // continuous=true würde Endlosbetrieb versuchen → anfälliger für Fehler
+    rec.continuous = false;
+
+    // interimResults=true: Zeigt Text während des Sprechens (live preview)
+    rec.interimResults = true;
+
+    // maxAlternatives=1: Nur beste Transkription
+    rec.maxAlternatives = 1;
+
+    // ── EVENT: Aufnahme gestartet ──
+    rec.onstart = () => {
+      console.log('[Speech] 🔴 Aufnahme gestartet');
+      state.listening = true;
+      state.interimTranscript = '';
+      updateSpeakBtn(true);
+      setStatusBadge('listening', '🔴', 'Aufnahme läuft…');
+
+      const t = document.getElementById('voice-transcript');
+      if (t) {
+        t.textContent = '🎙️ Jetzt sprechen…';
+        t.classList.add('listening');
+        t.classList.remove('active');
+      }
+    };
+
+    // ── EVENT: Sprachergebnis erhalten ──
+    rec.onresult = (e) => {
+      let interim = '';
+      let finalText = '';
+
+      // Alle Ergebnisse seit letztem Event zusammensetzen
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          finalText += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+
+      // Finaler Text hat Priorität, sonst interim anzeigen
+      const display = finalText || interim;
+      state.transcript = finalText || interim;
+
+      console.log('[Speech] 📝 Ergebnis erkannt:', { finalText, interim, display });
+
+      const t = document.getElementById('voice-transcript');
+      if (t) {
+        t.textContent = display || '…';
+        t.classList.remove('listening');
+        t.classList.add('active');
+      }
+    };
+
+    // ── EVENT: Fehler aufgetreten ──
+    rec.onerror = (e) => {
+      console.error('[Speech] ❌ Fehler:', e.error, e.message);
+      state.listening = false;
+      updateSpeakBtn(false);
+
+      const t = document.getElementById('voice-transcript');
+      let msg = '';
+      let badgeType = 'error';
+
+      switch (e.error) {
+        case 'not-allowed':
+          // Mikrofon verweigert — User muss Berechtigung erteilen
+          msg = '🚫 Mikrofonzugriff verweigert. Erlaube den Zugriff in den Browser-Einstellungen.';
+          console.error('[Speech] 🚫 Mikrofon-Berechtigung verweigert — User muss Berechtigung erteilen');
+          break;
+        case 'no-speech':
+          // Kein Ton erkannt — normaler Fall, kein echter Fehler
+          msg = 'Kein Ton erkannt. Nochmal versuchen.';
+          console.warn('[Speech] ⚠️ Kein Ton erkannt (no-speech)');
+          break;
+        case 'network':
+          msg = '🌐 Netzwerkfehler. Prüfe deine Internetverbindung.';
+          console.error('[Speech] 🌐 Netzwerkfehler bei Speech Recognition');
+          break;
+        case 'aborted':
+          // Manuell gestoppt — kein Fehler
+          console.log('[Speech] ⏹️ Aufnahme abgebrochen (aborted)');
+          return;
+        case 'audio-capture':
+          msg = '🎤 Kein Mikrofon gefunden. Schließe ein Mikrofon an.';
+          console.error('[Speech] 🎤 Kein Mikrofon gefunden');
+          break;
+        default:
+          msg = `Fehler: ${e.error}. Nochmal versuchen.`;
+      }
+
+      if (t && msg) {
+        t.textContent = msg;
+        t.classList.remove('listening', 'active');
+      }
+      setStatusBadge('error', '⚠️', 'Fehler');
+    };
+
+    // ── EVENT: Aufnahme beendet ──
+    rec.onend = () => {
+      console.log('[Speech] ⏹️ Aufnahme beendet. Transkript:', state.transcript);
+      state.listening = false;
+      updateSpeakBtn(false);
+
+      const t = document.getElementById('voice-transcript');
+      if (t) t.classList.remove('listening');
+
+      if (state.transcript && state.transcript.trim().length > 2) {
+        // Gutes Ergebnis → Submit-Buttons zeigen
+        t.classList.add('active');
+        setStatusBadge('done', '✅', 'Erkannt');
+        showVoiceSubmitButtons();
+      } else {
+        // Kein oder zu kurzer Text
+        setStatusBadge('idle', '🎙️', 'Bereit');
+      }
+    };
+
+    return rec;
+  }
+
+  // Erste Instanz erstellen
+  state.recognition = createRecognition();
+  state._createRecognition = createRecognition; // Factory für Neuerstellung
+}
+
+/* ══ STATUS BADGE UPDATER ══ */
+function setStatusBadge(type, icon, text) {
+  const badge = document.getElementById('speech-status-badge');
+  const iconEl = document.getElementById('speech-status-icon');
+  const textEl = document.getElementById('speech-status-text');
+  if (!badge) return;
+  badge.className = `speech-status-badge ${type}`;
+  if (iconEl) iconEl.textContent = icon;
+  if (textEl) textEl.textContent = text;
+}
+
+/* ══ SPEAK BUTTON UPDATE ══ */
+function updateSpeakBtn(listening) {
+  const btn = document.getElementById('speak-btn');
+  const lbl = document.getElementById('speak-btn-label');
+  const icon = document.getElementById('speak-icon');
+  if (!btn) return;
+
+  if (listening) {
+    btn.classList.add('listening');
+    if (lbl) lbl.textContent = '⏹ Stopp';
+    if (icon) icon.textContent = '⏺️';
+    btn.title = 'Aufnahme stoppen';
+  } else {
+    btn.classList.remove('listening');
+    if (lbl) lbl.textContent = 'Sprechen';
+    if (icon) icon.textContent = '🎙️';
+    btn.title = 'Aufnahme starten';
+  }
+}
+
+/* ══ TOGGLE LISTENING — SICHER GEGEN DOPPELAUFRUFE ══ */
+function toggleListening() {
+  if (!state.speechSupported) {
+    console.warn('[Speech] toggleListening() — Speech nicht unterstützt');
+    return;
+  }
+
+  if (state.listening) {
+    // ── Aufnahme stoppen ──
+    console.log('[Speech] ⏹ Stoppe Aufnahme...');
+    try {
+      state.recognition.stop();
+    } catch (err) {
+      console.warn('[Speech] Fehler beim Stoppen:', err);
+      state.listening = false;
+      updateSpeakBtn(false);
+    }
+  } else {
+    // ── Aufnahme starten ──
+    // WICHTIG: Neue Instanz erstellen um InvalidStateError zu vermeiden
+    // (passiert wenn rec.start() auf bereits beendeter Instanz aufgerufen wird)
+    console.log('[Speech] 🎙️ Starte neue Aufnahme...');
+
+    state.transcript = '';
+    hideVoiceSubmitButtons();
+
+    // Neue saubere Recognition-Instanz erstellen
+    if (state._createRecognition) {
+      state.recognition = state._createRecognition();
+    }
+
+    try {
+      state.recognition.start();
+      // Fallback: Wenn onstart nach 3s nicht kommt → Fehler anzeigen
+      state._startTimeout = setTimeout(() => {
+        if (!state.listening) {
+          console.warn('[Speech] ⚠️ start() hat nicht reagiert — mögliches Mikrofon-Problem');
+          const t = document.getElementById('voice-transcript');
+          if (t) t.textContent = 'Mikrofon reagiert nicht. Prüfe Browserberechtigungen.';
+          setStatusBadge('error', '⚠️', 'Kein Mikrofon');
+        }
+      }, 3000);
+    } catch (err) {
+      // InvalidStateError: Recognition bereits aktiv oder in ungültigem Zustand
+      console.error('[Speech] ❌ start() Fehler:', err.name, err.message);
+      state.listening = false;
+      updateSpeakBtn(false);
+      const t = document.getElementById('voice-transcript');
+      if (t) t.textContent = 'Starten fehlgeschlagen. Seite neu laden und nochmal versuchen.';
+      setStatusBadge('error', '⚠️', 'Start fehlgeschlagen');
+    }
+  }
+}
+
+function showVoiceSubmitButtons() {
+  document.getElementById('voice-submit-btn').style.display = 'flex';
+  document.getElementById('voice-retry-btn').style.display = 'flex';
+}
+
+function hideVoiceSubmitButtons() {
+  document.getElementById('voice-submit-btn').style.display = 'none';
+  document.getElementById('voice-retry-btn').style.display = 'none';
+}
+
+function clearVoice() {
+  state.transcript = '';
+  const t = document.getElementById('voice-transcript');
+  if (t) {
+    t.textContent = 'Klicke auf „Sprechen" und antworte wie im echten Call…';
+    t.classList.remove('active', 'listening');
+  }
+  setStatusBadge('idle', '🎙️', 'Bereit');
+  hideVoiceSubmitButtons();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VOICE ANSWER SUBMIT + KI BEWERTUNG
+══════════════════════════════════════════════════════════════ */
+async function submitVoiceAnswer() {
+  if (!state.transcript || state.transcript.length < 3) return;
+  if (!state.currentNode) return;
+
+  const userText = state.transcript;
+  state.transcript = '';
+
+  // Voice Mode UI ausblenden
+  document.getElementById('voice-mode-area').style.display = 'none';
+  document.getElementById('speak-btn').disabled = true;
+  hideVoiceSubmitButtons();
+  clearVoice();
+
+  // User-Message anzeigen (mit voice badge)
+  addMessage('player', null, userText, true);
+
+  // Analysiere Antwort mit lokalem Algorithmus
+  const evaluation = evaluateVoiceAnswer(userText, state.currentNode);
+
+  // Zeige AI Loading
+  const fbContainer = document.getElementById('feedback-container');
+  fbContainer.innerHTML = `<div class="ai-loading"><div class="ai-spinner"></div><span>Analysiere deine Antwort...</span></div>`;
+
+  // Kurze Verzögerung für Realismus
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+
+  // Stats updaten
+  state.trust += evaluation.trustDelta;
+  state.closeChance += evaluation.closeDelta;
+  let points = evaluation.quality === 'good' ? 30 : evaluation.quality === 'neutral' ? 10 : -5;
+  state.totalScore += points;
+  state.levelScore += points;
+  updateStats(evaluation.trustDelta, evaluation.closeDelta);
+  awardXP({ quality: evaluation.quality, trust: evaluation.trustDelta, close: evaluation.closeDelta });
+  playTone(evaluation.quality === 'good' ? 'good' : evaluation.quality === 'bad' ? 'bad' : null);
+
+  // Feedback anzeigen
+  showVoiceFeedback(evaluation, userText, () => {
+    if (evaluation.levelEnd) {
+      setTimeout(() => endLevel(evaluation.levelEnd.won), 300);
+    } else if (evaluation.next) {
+      const nextNode = state.dialogueMap[evaluation.next];
+      if (nextNode) setTimeout(() => renderDialogue(nextNode), 400);
+    }
+  });
+}
+
+// ── Lokaler Bewertungsalgorithmus ──
+function evaluateVoiceAnswer(text, node) {
+  const t = text.toLowerCase();
+  const choices = node.choices;
+
+  // Scoring-Dimensionen
+  let scores = {
+    klarheit: 0,
+    einwandBehandlung: 0,
+    selbstbewusstsein: 0,
+    empathie: 0,
+    fragetechnik: 0
+  };
+
+  // Klarheit: Satzlänge und Struktur
+  const words = text.split(/\s+/).length;
+  scores.klarheit = words >= 10 && words <= 60 ? 80 : words < 5 ? 20 : 60;
+
+  // Fragetechnik: enthält Frage?
+  if (t.includes('?') || /was|wie|wann|warum|wer|können sie|darf ich|würden sie/i.test(t)) {
+    scores.fragetechnik = 85;
+  } else {
+    scores.fragetechnik = 30;
+  }
+
+  // Einwandbehandlung: reagiert auf Kontext?
+  const positiveSignals = ['verstehe', 'nachvollziehen', 'berechtigt', 'gut', 'genau', 'absolut', 'stimmt', 'richtig'];
+  const weakSignals = ['sorry', 'entschuldigung', 'vielleicht', 'wahrscheinlich', 'könnte', 'eventuell', 'leider'];
+  const strongSignals = ['garantie', 'konkret', 'ergebnis', 'lösung', 'schritt', 'termin', 'datum', 'wert', 'investition', 'roi'];
+
+  let posCount = positiveSignals.filter(s => t.includes(s)).length;
+  let weakCount = weakSignals.filter(s => t.includes(s)).length;
+  let strongCount = strongSignals.filter(s => t.includes(s)).length;
+
+  scores.einwandBehandlung = Math.min(100, 40 + posCount * 10 + strongCount * 15 - weakCount * 15);
+
+  // Selbstbewusstsein: keine Entschuldigungen, starke Sprache
+  scores.selbstbewusstsein = Math.max(0, 80 - weakCount * 20 + strongCount * 10);
+
+  // Empathie
+  const empathieSignals = ['verstehe', 'nachvollziehen', 'berechtigt', 'fühle', 'gut dass', 'ehrlich', 'tut mir leid'];
+  scores.empathie = Math.min(100, 30 + empathieSignals.filter(s => t.includes(s)).length * 20);
+
+  // Vergleiche mit best choice
+  const bestChoice = choices.find(c => c.quality === 'good') || choices[0];
+  const bestText = bestChoice.text.toLowerCase();
+
+  // Keyword-Matching mit bester Antwort
+  const bestKeywords = bestText.split(/\s+/).filter(w => w.length > 4);
+  const userKeywords = t.split(/\s+/).filter(w => w.length > 4);
+  const matchCount = bestKeywords.filter(k => userKeywords.some(u => u.includes(k.slice(0,5)) || k.includes(u.slice(0,5)))).length;
+  const matchRatio = bestKeywords.length > 0 ? matchCount / bestKeywords.length : 0;
+
+  // Gesamtbewertung
+  const avgScore = (scores.klarheit + scores.einwandBehandlung + scores.selbstbewusstsein + scores.empathie + scores.fragetechnik) / 5;
+  const finalScore = Math.round(avgScore * 0.6 + matchRatio * 100 * 0.4);
+
+  let quality, trustDelta, closeDelta, next, levelEnd;
+
+  if (finalScore >= 60) {
+    quality = 'good';
+    trustDelta = bestChoice.trust;
+    closeDelta = bestChoice.close;
+    next = bestChoice.next;
+    levelEnd = bestChoice.levelEnd;
+  } else if (finalScore >= 35) {
+    quality = 'neutral';
+    const neutralChoice = choices.find(c => c.quality === 'neutral') || choices[Math.floor(choices.length/2)];
+    trustDelta = Math.round((bestChoice.trust + (neutralChoice.trust || 0)) / 2 * 0.6);
+    closeDelta = Math.round((bestChoice.close + (neutralChoice.close || 0)) / 2 * 0.6);
+    next = bestChoice.next;
+    levelEnd = bestChoice.levelEnd ? { won: bestChoice.levelEnd.won ? Math.random() > 0.4 : false } : undefined;
+  } else {
+    quality = 'bad';
+    const badChoice = choices.find(c => c.quality === 'bad') || choices[choices.length - 1];
+    trustDelta = badChoice.trust;
+    closeDelta = badChoice.close;
+    next = badChoice.next || bestChoice.next;
+    levelEnd = badChoice.levelEnd || (bestChoice.levelEnd ? { won: false } : undefined);
+  }
+
+  // Spezifisches Feedback basierend auf Analyse
+  const feedbackGood = quality === 'good'
+    ? `Starke Antwort! ${scores.fragetechnik > 60 ? 'Deine Fragetechnik war gut.' : ''} ${scores.empathie > 60 ? 'Gute Empathie gezeigt.' : ''} Du hast den Kunden klar angesprochen.`
+    : quality === 'neutral'
+    ? `Solide Antwort, aber ausbaufähig. ${weakCount > 0 ? 'Vermeide schwache Wörter wie "vielleicht" oder "wahrscheinlich".' : ''} ${scores.fragetechnik < 50 ? 'Eine Gegenfrage hätte den Dialog geöffnet.' : ''}`
+    : `Schwache Antwort. ${weakCount > 0 ? 'Zu viele Weich-Wörter und Unsicherheit.' : ''} ${scores.klarheit < 50 ? 'Die Antwort war zu kurz oder unklar.' : ''} Schaue dir die Profi-Variante an.`;
+
+  const proTip = bestChoice.feedback.pro;
+
+  return {
+    quality, trustDelta, closeDelta, next, levelEnd,
+    scores, finalScore, feedbackGood, proTip,
+    bestAnswer: bestChoice.text
+  };
+}
+
+function showVoiceFeedback(evaluation, userText, onContinue) {
+  const container = document.getElementById('feedback-container');
+  const qualityIcon = evaluation.quality === 'good' ? '✓' : evaluation.quality === 'neutral' ? '→' : '✗';
+  const qualityLabel = evaluation.quality === 'good' ? 'Starke Antwort' : evaluation.quality === 'neutral' ? 'Ausbaufähig' : 'Schwache Antwort';
+  const trustText = (evaluation.trustDelta >= 0 ? '+' : '') + evaluation.trustDelta + ' Vertrauen';
+  const closeText = (evaluation.closeDelta >= 0 ? '+' : '') + evaluation.closeDelta + ' Chance';
+
+  container.innerHTML = `
+    <div class="feedback-panel">
+      <div class="fb-header">
+        <span class="fb-quality-badge ${evaluation.quality}">${qualityIcon} ${qualityLabel}</span>
+        <div class="fb-deltas">
+          <span class="delta-tag ${evaluation.trustDelta >= 0 ? 'pos' : 'neg'}">${trustText}</span>
+          <span class="delta-tag ${evaluation.closeDelta >= 0 ? 'pos' : 'neg'}">${closeText}</span>
+        </div>
+      </div>
+      <div class="fb-text">${evaluation.feedbackGood}</div>
+
+      <div class="ai-score-panel">
+        <div class="ai-score-label">KI-Analyse deiner Antwort</div>
+        <div class="ai-score-bars">
+          ${Object.entries(evaluation.scores).map(([k,v]) => `
+            <div class="ai-score-row">
+              <span class="ai-score-name">${{klarheit:'Klarheit',einwandBehandlung:'Einwandhandl.',selbstbewusstsein:'Selbstsicherheit',empathie:'Empathie',fragetechnik:'Fragetechnik'}[k]}</span>
+              <div class="ai-score-bar">
+                <div class="ai-score-fill fill-${v >= 70 ? 'green' : v >= 45 ? 'gold' : 'red'}" style="width:${v}%"></div>
+              </div>
+              <span class="ai-score-val">${v}/100</span>
+            </div>
+          `).join('')}
+        </div>
+        ${evaluation.quality !== 'good' ? `<div class="ai-feedback-text"><strong>Beste Antwort wäre:</strong> "${evaluation.bestAnswer}"</div>` : ''}
+      </div>
+
+      <div class="fb-pro">
+        <div class="fb-pro-label">💎 Profi-Tipp</div>
+        <div class="fb-pro-text">${evaluation.proTip}</div>
+      </div>
+      <button class="btn-continue" id="voice-fb-continue">Weiter →</button>
+    </div>
+  `;
+
+  // Cat Coach
+  setTimeout(() => showCatCoach({ quality: evaluation.quality, feedback: { good: evaluation.feedbackGood, pro: evaluation.proTip }, trust: evaluation.trustDelta, close: evaluation.closeDelta }), 300);
+
+  panel_scroll(container);
+
+  document.getElementById('voice-fb-continue').onclick = () => {
+    container.innerHTML = '';
+    hideCatCoach();
+    document.getElementById('speak-btn').disabled = false;
+    onContinue();
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INPUT MODUS TOGGLE (Sprache / Klick)
+══════════════════════════════════════════════════════════════ */
+function toggleInputMode() {
+  state.voiceMode = !state.voiceMode;
+  updateVoiceDock();
+}
+
+function updateVoiceDock() {
+  const btn = document.getElementById('mode-toggle-btn');
+  const speakBtn = document.getElementById('speak-btn');
+  const manualWrap = document.getElementById('manual-input-wrap');
+
+  if (state.voiceMode && state.speechSupported) {
+    // SPRACH-MODUS
+    if (btn) { btn.textContent = '🖱️'; btn.classList.remove('active'); btn.title = 'Zu Text-Modus wechseln'; }
+    if (speakBtn) speakBtn.disabled = false;
+    if (manualWrap) manualWrap.classList.remove('show');
+  } else {
+    // TEXT-MODUS (Fallback)
+    if (btn) { btn.textContent = '🎙️'; btn.classList.add('active'); btn.title = 'Zu Sprach-Modus wechseln'; }
+    if (speakBtn) speakBtn.disabled = true;
+    if (manualWrap) manualWrap.classList.add('show');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TEXT-TO-SPEECH — ROBUSTE IMPLEMENTIERUNG v4
+   ──────────────────────────────────────────────────────────────
+   BEKANNTE PROBLEME & FIXES:
+   1. Chrome pausiert speechSynthesis nach ~15s (Chrome Bug #509488)
+      → Fix: speechSynthesis.resume() Interval während Wiedergabe
+   2. Voices nicht direkt beim Laden verfügbar (async)
+      → Fix: onvoiceschanged Event + getVoices() Cache
+   3. SpeechSynthesisUtterance auf mobile oft stumm
+      → Fix: volume=1.0, rate=1.0, erst nach User-Interaktion
+══════════════════════════════════════════════════════════════ */
+
+// Voices-Cache (wird async befüllt)
+let _ttsVoicesCache = [];
+let _ttsResumeInterval = null;
+
+// Voices laden (muss nach User-Interaktion passieren wegen Autoplay-Policy)
+function loadTTSVoices() {
+  if (!window.speechSynthesis) return;
+  _ttsVoicesCache = window.speechSynthesis.getVoices();
+  console.log('[TTS] 🔊 Voices geladen:', _ttsVoicesCache.length, 'Stimmen verfügbar');
+}
+
+// Event: Voices werden oft erst async verfügbar
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = loadTTSVoices;
+  loadTTSVoices(); // Sofort versuchen (Chrome hat sie manchmal direkt)
+}
+
+function toggleTTS() {
+  state.ttsEnabled = !state.ttsEnabled;
+  const btn = document.getElementById('tts-toggle');
+  if (btn) {
+    if (state.ttsEnabled) {
+      btn.textContent = '🔊 Stimme';
+      btn.classList.add('active');
+      console.log('[TTS] 🔊 Text-to-Speech aktiviert');
+      // Voices jetzt laden (nach User-Interaktion — wichtig für Autoplay-Policy)
+      loadTTSVoices();
+    } else {
+      btn.textContent = '🔇 Stimme';
+      btn.classList.remove('active');
+      console.log('[TTS] 🔇 Text-to-Speech deaktiviert');
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      stopTTSResumeInterval();
+    }
+  }
+}
+
+// Chrome-Fix: speechSynthesis pausiert nach ~15s
+// → Alle 10s resume() aufrufen während aktiver Wiedergabe
+function startTTSResumeInterval() {
+  stopTTSResumeInterval();
+  _ttsResumeInterval = setInterval(() => {
+    if (window.speechSynthesis && window.speechSynthesis.paused) {
+      console.log('[TTS] 🔄 Chrome TTS pause fix — resume()');
+      window.speechSynthesis.resume();
+    }
+  }, 10000);
+}
+
+function stopTTSResumeInterval() {
+  if (_ttsResumeInterval) {
+    clearInterval(_ttsResumeInterval);
+    _ttsResumeInterval = null;
+  }
+}
+
+function speakText(text, callback) {
+  // Früh abbrechen wenn TTS deaktiviert oder nicht verfügbar
+  if (!window.speechSynthesis) {
+    console.warn('[TTS] speechSynthesis nicht verfügbar');
+    if (callback) callback();
+    return;
+  }
+  if (!state.ttsEnabled) {
+    if (callback) callback();
+    return;
+  }
+
+  // Laufende Sprachausgabe unterbrechen
+  window.speechSynthesis.cancel();
+  stopTTSResumeInterval();
+
+  // HTML-Tags und Entities bereinigen
+  const clean = text
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim();
+
+  if (!clean) { if (callback) callback(); return; }
+
+  console.log('[TTS] 🔊 Spreche:', clean.substring(0, 60) + (clean.length > 60 ? '…' : ''));
+
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = 'de-DE';
+  utt.rate = 1.05;
+  utt.pitch = 1.0;
+  utt.volume = 1.0; // Max volume für Mobile
+
+  // Beste deutsche Stimme auswählen
+  // Priorität: lokal > remote, weiblich > männlich (für Kunden-Simulation)
+  const voices = _ttsVoicesCache.length > 0 ? _ttsVoicesCache : window.speechSynthesis.getVoices();
+  const germanVoices = voices.filter(v => v.lang && (v.lang.startsWith('de') || v.lang === 'de-DE'));
+
+  if (germanVoices.length > 0) {
+    // Lokale Stimme bevorzugen (kein Netzwerk nötig, schneller)
+    const localVoice = germanVoices.find(v => v.localService);
+    utt.voice = localVoice || germanVoices[0];
+    console.log('[TTS] 🗣️ Stimme:', utt.voice.name, '(lokal:', utt.voice.localService, ')');
+  } else {
+    console.warn('[TTS] ⚠️ Keine deutsche Stimme gefunden — Systemstimme wird verwendet');
+  }
+
+  utt.onstart = () => {
+    console.log('[TTS] ▶️ Wiedergabe gestartet');
+    startTTSResumeInterval(); // Chrome-Pause-Bug Fix starten
+  };
+
+  utt.onend = () => {
+    console.log('[TTS] ✅ Wiedergabe beendet');
+    stopTTSResumeInterval();
+    if (callback) callback();
+  };
+
+  utt.onerror = (e) => {
+    // 'interrupted' ist normal wenn cancel() aufgerufen wird
+    if (e.error !== 'interrupted') {
+      console.warn('[TTS] ⚠️ Fehler:', e.error);
+    }
+    stopTTSResumeInterval();
+    if (callback) callback();
+  };
+
+  // Kleines Delay für Chrome (verhindert sofortiges Abbrechen nach cancel())
+  setTimeout(() => {
+    try {
+      window.speechSynthesis.speak(utt);
+    } catch (err) {
+      console.error('[TTS] speak() Fehler:', err);
+      if (callback) callback();
+    }
+  }, 50);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MANUELLES TEXT-FALLBACK
+   Wenn SpeechRecognition nicht verfügbar oder der User tippen möchte
+══════════════════════════════════════════════════════════════ */
+function submitManualAnswer() {
+  const input = document.getElementById('manual-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text || text.length < 3) {
+    input.style.borderColor = 'rgba(239,68,68,0.5)';
+    input.placeholder = 'Bitte gib eine Antwort ein (mind. 3 Zeichen)…';
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+  console.log('[Manual] ✏️ Manuelle Antwort eingereicht:', text.substring(0, 60));
+  state.transcript = text;
+  input.value = '';
+  submitVoiceAnswer(); // Gleiches Bewertungssystem wie Spracheingabe
+}
+
+// Enter-Key Support für manuelle Eingabe (Shift+Enter = Zeilenumbruch)
+document.addEventListener('keydown', (e) => {
+  const input = document.getElementById('manual-input');
+  if (e.target === input && e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    submitManualAnswer();
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   GAME INIT
+══════════════════════════════════════════════════════════════ */
+function startGame() {
+  // Browser-Umgebung prüfen (HTTPS, Browser-Typ)
+  checkEnvironment();
+
+  state.LEVELS = getLevels(state.niche, state.target);
+  state.currentLevel = 0;
+  state.totalScore = 0;
+  state.levelResults = [];
+  state.currentRank = 0;
+  state.xp = 0;
+  state.playerLevel = 1;
+  state.xpThreshold = 100;
+  updateXP();
+  initSpeech();
+  loadLevel(0);
+}
+
+function restartGame() {
+  showScreen('start');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LEVEL LADEN
+══════════════════════════════════════════════════════════════ */
+function loadLevel(idx) {
+  const level = state.LEVELS[idx];
+  state.trust = level.trustStart;
+  state.closeChance = level.closeStart;
+  state.levelScore = 0;
+
+  // Dialogue Map
+  state.dialogueMap = {};
+  level.dialogue.forEach(d => { state.dialogueMap[d.id] = d; });
+
+  // UI update
+  showScreen('game');
+  updateHeader(level, idx);
+  updateStats();
+  clearChat();
+  clearChoices();
+  document.getElementById('feedback-container').innerHTML = '';
+  hideCatCoach();
+
+  // Kunden-Karte
+  document.getElementById('cust-avatar').textContent = level.customer.emoji;
+  document.getElementById('cust-name').textContent = level.customer.name;
+  document.getElementById('cust-meta').textContent = level.customer.meta;
+  const traitsEl = document.getElementById('cust-traits');
+  traitsEl.innerHTML = level.customer.traits.map(t =>
+    `<span class="trait ${t.type}">${t.label}</span>`
+  ).join('');
+
+  // Intro message
+  addMessage('system', null, level.intro + ' — ' + level.context);
+
+  // Voice Mode bereit
+  if (state.voiceMode && state.speechSupported) {
+    document.getElementById('voice-mode-area').style.display = 'none';
+    document.getElementById('speak-btn').disabled = true;
+  }
+
+  // Erster Dialog
+  setTimeout(() => renderDialogue(state.dialogueMap['start']), 700);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HEADER & STATS
+══════════════════════════════════════════════════════════════ */
+function updateHeader(level, idx) {
+  document.getElementById('level-chip').textContent = 'Level ' + level.id;
+  const dots = document.getElementById('prog-dots');
+  dots.innerHTML = '';
+  state.LEVELS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'prog-dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    dots.appendChild(d);
+  });
+}
+
+function updateStats(trustD, closeD) {
+  state.trust = Math.max(0, Math.min(100, state.trust));
+  state.closeChance = Math.max(0, Math.min(100, state.closeChance));
+  document.getElementById('bar-trust').style.width = state.trust + '%';
+  document.getElementById('val-trust').textContent = state.trust;
+  document.getElementById('bar-close').style.width = state.closeChance + '%';
+  document.getElementById('val-close').textContent = state.closeChance;
+  document.getElementById('score-chip').textContent = state.totalScore + ' Pkt.';
+  const closeBar = document.getElementById('bar-close');
+  closeBar.className = 'mini-bar-fill ' + (state.closeChance > 50 ? 'fill-green' : state.closeChance > 25 ? 'fill-gold' : 'fill-red');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   XP SYSTEM
+══════════════════════════════════════════════════════════════ */
+function awardXP(choice) {
+  const xpGain = choice.quality === 'good' ? (choice.trust > 10 && choice.close > 15 ? 65 : 40) : choice.quality === 'neutral' ? 15 : 5;
+  state.xp += xpGain;
+  updateXP();
+  if (state.xp >= state.xpThreshold) {
+    state.xp -= state.xpThreshold;
+    state.playerLevel++;
+    state.xpThreshold = Math.round(state.xpThreshold * 1.3);
+    showLevelUp();
+    updateXP();
+  }
+  // XP Float
+  showXPFloat(xpGain);
+}
+
+function updateXP() {
+  document.getElementById('xp-val').textContent = state.xp;
+}
+
+function showLevelUp() {
+  const overlay = document.getElementById('levelup-overlay');
+  document.getElementById('levelup-text').innerHTML = `⚡ Level ${state.playerLevel}!<br><span style="font-size:20px;opacity:0.8">XP Level Up!</span>`;
+  overlay.classList.add('show');
+  playTone('levelup');
+  setTimeout(() => overlay.classList.remove('show'), 2200);
+}
+
+function showXPFloat(xp) {
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = '+' + xp + ' XP';
+  el.style.cssText = `position:fixed;right:16px;top:${60 + Math.random()*30}px;font-size:14px;font-weight:800;color:#a78bfa;pointer-events:none;z-index:9998;animation:xpFloat 1.4s ease-out forwards;`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+// XP Float Keyframe (dynamisch injiziert)
+const xpStyle = document.createElement('style');
+xpStyle.textContent = `@keyframes xpFloat { 0% { opacity:1; transform:translateY(0) scale(1); } 60% { opacity:1; transform:translateY(-50px) scale(1.1); } 100% { opacity:0; transform:translateY(-80px) scale(0.9); } }`;
+document.head.appendChild(xpStyle);
+
+/* ══════════════════════════════════════════════════════════════
+   CHAT & CHOICES
+══════════════════════════════════════════════════════════════ */
+function clearChat() { document.getElementById('chat-area').innerHTML = ''; }
+function clearChoices() { document.getElementById('choices-area').innerHTML = ''; }
+
+function addMessage(speaker, name, text, isVoice = false) {
+  const chat = document.getElementById('chat-area');
+  const level = state.LEVELS[state.currentLevel];
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + speaker;
+
+  if (speaker === 'system') {
+    msg.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  } else {
+    const isCustomer = speaker === 'customer';
+    const emoji = isCustomer ? (level ? level.customer.emoji : '👤') : '🎯';
+    const who = isCustomer ? (level ? level.customer.name : 'Kunde') : 'Du';
+    const voiceClass = isVoice ? ' voice-msg' : '';
+    const voiceBadge = isVoice ? ' <span style="font-size:9px;opacity:0.7">🎙️</span>' : '';
+    msg.innerHTML = `
+      <div class="msg-ava">${emoji}</div>
+      <div class="msg-inner">
+        <div class="msg-who">${who}${voiceBadge}</div>
+        <div class="msg-bubble${voiceClass}">${text}</div>
+      </div>
+    `;
+  }
+
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+  return msg;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat-area');
+  const level = state.LEVELS[state.currentLevel];
+  const typing = document.createElement('div');
+  typing.className = 'msg customer';
+  typing.id = 'typing-ind';
+  typing.innerHTML = `
+    <div class="msg-ava">${level ? level.customer.emoji : '👤'}</div>
+    <div class="msg-inner">
+      <div class="msg-who">${level ? level.customer.name : 'Kunde'}</div>
+      <div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+    </div>
+  `;
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-ind');
+  if (t) t.remove();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DIALOG RENDERING
+══════════════════════════════════════════════════════════════ */
+function renderDialogue(node) {
+  if (!node) return;
+  state.currentNode = node;
+
+  showTyping();
+  const delay = Math.min(600 + node.text.length * 14, 2500);
+
+  setTimeout(() => {
+    removeTyping();
+    addMessage('customer', null, node.text);
+
+    // TTS für Kunde
+    speakText(node.text);
+
+    if (node.isClosingMoment) {
+      const chat = document.getElementById('chat-area');
+      const banner = document.createElement('div');
+      banner.className = 'closing-banner';
+      banner.textContent = '⚡ Closing-Moment – Jetzt zählt jede Entscheidung';
+      chat.appendChild(banner);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    setTimeout(() => renderChoices(node), 350);
+  }, delay);
+}
+
+function renderChoices(node) {
+  clearChoices();
+  hideCatCoach();
+
+  if (state.voiceMode && state.speechSupported) {
+    // SPRACH-MODUS: Zeige Transcriptions-Bereich
+    document.getElementById('voice-mode-area').style.display = 'block';
+    document.getElementById('voice-transcript').textContent = 'Klicke auf "Sprechen" und antworte wie im echten Call...';
+    document.getElementById('voice-transcript').classList.remove('active', 'listening');
+    document.getElementById('speak-btn').disabled = false;
+    hideVoiceSubmitButtons();
+  } else {
+    // KLICK-MODUS: Zeige Antwort-Buttons
+    document.getElementById('voice-mode-area').style.display = 'none';
+    const area = document.getElementById('choices-area');
+
+    const label = document.createElement('div');
+    label.className = 'choices-label';
+    label.textContent = '↳ Deine Antwort';
+    area.appendChild(label);
+
+    node.choices.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.style.animationDelay = (idx * 0.07) + 's';
+      btn.innerHTML = `
+        <span class="choice-num">0${idx + 1}</span>
+        <div>
+          <div>${choice.text}</div>
+        </div>
+      `;
+      btn.onclick = () => handleClickChoice(node, choice, btn);
+      area.appendChild(btn);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   KLICK-MODUS CHOICE HANDLING
+══════════════════════════════════════════════════════════════ */
+function handleClickChoice(node, choice, btnEl) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  // Animation
+  btnEl.classList.add(choice.quality === 'good' ? 'correct' : choice.quality === 'bad' ? 'wrong' : '');
+
+  // Flash
+  if (choice.quality === 'good') {
+    document.getElementById('screen-game').classList.add('screen-flash-good');
+    setTimeout(() => document.getElementById('screen-game').classList.remove('screen-flash-good'), 700);
+  } else if (choice.quality === 'bad') {
+    document.getElementById('screen-game').classList.add('screen-flash-bad');
+    setTimeout(() => document.getElementById('screen-game').classList.remove('screen-flash-bad'), 600);
+  }
+
+  setTimeout(() => {
+    clearChoices();
+    addMessage('player', null, choice.text);
+
+    state.trust += choice.trust;
+    state.closeChance += choice.close;
+    let points = choice.quality === 'good' ? 30 : choice.quality === 'neutral' ? 10 : -5;
+    state.totalScore += points;
+    state.levelScore += points;
+    updateStats(choice.trust, choice.close);
+    awardXP(choice);
+    playTone(choice.quality === 'good' ? 'good' : choice.quality === 'bad' ? 'bad' : null);
+
+    showClickFeedback(choice, () => {
+      if (choice.levelEnd) {
+        setTimeout(() => endLevel(choice.levelEnd.won), 300);
+      } else if (choice.next) {
+        const nextNode = state.dialogueMap[choice.next];
+        if (nextNode) setTimeout(() => renderDialogue(nextNode), 400);
+      }
+    });
+  }, choice.quality === 'bad' ? 450 : 150);
+}
+
+function showClickFeedback(choice, onContinue) {
+  const container = document.getElementById('feedback-container');
+  const qualityIcon = choice.quality === 'good' ? '✓' : choice.quality === 'neutral' ? '→' : '✗';
+  const qualityLabel = choice.quality === 'good' ? 'Starke Antwort' : choice.quality === 'neutral' ? 'Ausbaufähig' : 'Schwache Antwort';
+  const trustText = (choice.trust >= 0 ? '+' : '') + choice.trust + ' Vertrauen';
+  const closeText = (choice.close >= 0 ? '+' : '') + choice.close + ' Chance';
+
+  container.innerHTML = `
+    <div class="feedback-panel">
+      <div class="fb-header">
+        <span class="fb-quality-badge ${choice.quality}">${qualityIcon} ${qualityLabel}</span>
+        <div class="fb-deltas">
+          <span class="delta-tag ${choice.trust >= 0 ? 'pos' : 'neg'}">${trustText}</span>
+          <span class="delta-tag ${choice.close >= 0 ? 'pos' : 'neg'}">${closeText}</span>
+        </div>
+      </div>
+      <div class="fb-text">${choice.feedback.good}</div>
+      <div class="fb-pro">
+        <div class="fb-pro-label">💎 Profi-Tipp</div>
+        <div class="fb-pro-text">${choice.feedback.pro}</div>
+      </div>
+      <button class="btn-continue" id="click-fb-continue">Weiter →</button>
+    </div>
+  `;
+
+  setTimeout(() => showCatCoach(choice), 300);
+  panel_scroll(container);
+
+  document.getElementById('click-fb-continue').onclick = () => {
+    container.innerHTML = '';
+    hideCatCoach();
+    onContinue();
+  };
+}
+
+function panel_scroll(el) {
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COACHING KATZE MIA
+══════════════════════════════════════════════════════════════ */
+function getCatFeedback(choice) {
+  if (choice.quality === 'good') return {
+    mood: 'great', moodLabel: '😸 Stark!',
+    good: choice.feedback ? choice.feedback.good : 'Sehr gute Antwort!',
+    key: `Vertrauen ${choice.trust >= 0 ? '+' : ''}${choice.trust}, Chance ${choice.close >= 0 ? '+' : ''}${choice.close}`,
+    improve: 'Noch besser: Baue eine Gegenfrage ein, die den Dialog offen hält.',
+    pro: choice.feedback ? choice.feedback.pro : 'Bleibe so!'
+  };
+  if (choice.quality === 'neutral') return {
+    mood: 'okay', moodLabel: '🐱 Solide!',
+    good: 'Du bist auf dem richtigen Weg – die Richtung stimmt.',
+    key: choice.feedback ? choice.feedback.good : 'Schaue dir die Profi-Variante an.',
+    improve: 'Hast du hier den Nutzen für den Kunden klar gemacht, oder Features aufgezählt?',
+    pro: choice.feedback ? choice.feedback.pro : 'Konkretheit schlägt Vagheit.'
+  };
+  return {
+    mood: 'poor', moodLabel: '🙀 Aua!',
+    good: 'Mutig! Jeder Fehler ist Lernen – und du lernst gerade etwas Wichtiges.',
+    key: choice.feedback ? choice.feedback.good : 'Analysiere was schief lief.',
+    improve: 'Was nächstes Mal: Stell dich in die Schuhe des Kunden. Was braucht er?',
+    pro: choice.feedback ? choice.feedback.pro : 'Die beste Antwort findest du im Feedback.'
+  };
+}
+
+function showCatCoach(choice) {
+  const wrapper = document.getElementById('cat-coach');
+  if (!wrapper) return;
+  const fb = getCatFeedback(choice);
+
+  wrapper.innerHTML = `
+    <div class="cat-card">
+      <div class="cat-emo">${fb.mood === 'great' ? '😸' : fb.mood === 'okay' ? '🐱' : '🙀'}</div>
+      <div class="cat-bubble">
+        <div class="cat-top">
+          <div class="cat-name-badge">
+            <span class="cat-name">Mia</span>
+            <span class="cat-mood ${fb.mood}">${fb.moodLabel}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)">Sales Coach</span>
+            ${window.speechSynthesis ? `<button class="cat-tts-btn" id="cat-tts-btn" onclick="speakCatFeedback()">🔊 Hören</button>` : ''}
+          </div>
+        </div>
+        <div class="cat-rows">
+          <div class="cat-row"><span class="cat-row-icon">✅</span><span><strong>Was gut war:</strong> ${fb.good}</span></div>
+          <div class="cat-row"><span class="cat-row-icon">🎯</span><span><strong>Punkt:</strong> ${fb.key}</span></div>
+          <div class="cat-row"><span class="cat-row-icon">💡</span><span><strong>Noch besser:</strong> ${fb.improve}</span></div>
+          <div class="cat-row"><span class="cat-row-icon">🏆</span><span><strong>Profi sagt:</strong> ${fb.pro}</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  wrapper.style.display = 'block';
+  setTimeout(() => wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+
+  if (state.ttsEnabled) {
+    const text = `${fb.good}. Wichtig: ${fb.key}. Tipp: ${fb.improve}`;
+    setTimeout(() => speakText(text), 500);
+  }
+}
+
+function speakCatFeedback() {
+  const rows = document.querySelectorAll('.cat-row');
+  let text = 'Mia, dein Sales Coach: ';
+  rows.forEach(r => text += r.textContent.trim() + '. ');
+  const wasEnabled = state.ttsEnabled;
+  state.ttsEnabled = true;
+  speakText(text);
+  state.ttsEnabled = wasEnabled || true;
+}
+
+function hideCatCoach() {
+  const w = document.getElementById('cat-coach');
+  if (w) { w.style.display = 'none'; w.innerHTML = ''; }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LEVEL END
+══════════════════════════════════════════════════════════════ */
+function endLevel(won) {
+  const level = state.LEVELS[state.currentLevel];
+
+  state.levelResults.push({
+    level: level.id, won, trust: state.trust, close: state.closeChance, score: state.levelScore
+  });
+
+  playTone('levelup');
+  showScreen('levelend');
+
+  const resultEl = document.getElementById('le-result');
+  const titleEl = document.getElementById('le-title');
+
+  if (won) {
+    resultEl.textContent = '✓ Abschluss erreicht';
+    resultEl.className = 'le-result win';
+    titleEl.textContent = level.id === 5 ? 'Meisterabschluss!' : 'Deal gemacht!';
+  } else {
+    resultEl.textContent = '✗ Kein Abschluss';
+    resultEl.className = 'le-result lose';
+    titleEl.textContent = 'Nicht ganz – beim nächsten Mal!';
+  }
+
+  // Stars
+  const starsEl = document.getElementById('le-stars');
+  starsEl.innerHTML = '';
+  const starCount = won ? (state.trust > 70 ? 3 : state.trust > 50 ? 2 : 1) : 0;
+  for (let i = 0; i < 3; i++) {
+    const star = document.createElement('div');
+    star.className = 'le-star' + (i < starCount ? ' earned' : '');
+    star.textContent = '★';
+    starsEl.appendChild(star);
+    if (i < starCount) {
+      setTimeout(() => { star.style.transform = 'scale(1.3)'; }, i * 180 + 100);
+      setTimeout(() => { star.style.transform = 'scale(1)'; }, i * 180 + 350);
+    }
+  }
+
+  document.getElementById('le-trust').textContent = state.trust;
+  document.getElementById('le-close').textContent = state.closeChance + '%';
+  document.getElementById('le-score').textContent = state.levelScore;
+
+  // Feedback
+  const fbEl = document.getElementById('le-feedback');
+  const fbs = won ? [
+    { icon: '✓', text: `<strong>Vertrauen aufgebaut:</strong> ${state.trust}/100 – ${state.trust > 70 ? 'Exzellent. Echte Verbindung aufgebaut.' : 'Solide Basis.'}` },
+    { icon: '✓', text: `<strong>Abschlusschance:</strong> ${state.closeChance}% – ${state.closeChance > 50 ? 'Der Kunde war überzeugt.' : 'Knapp, aber geschafft.'}` }
+  ] : [
+    { icon: '✗', text: `<strong>Kein Abschluss:</strong> ${state.trust < 40 ? 'Das Vertrauen war zu niedrig.' : 'Du hattest Vertrauen – aber den Moment verpasst.'}` },
+    { icon: '→', text: '<strong>Nächstes Mal:</strong> Erkenne Kaufsignale früher und führe konkreter zum nächsten Schritt.' }
+  ];
+  fbEl.innerHTML = fbs.map(f => `<div class="le-fb-row"><span>${f.icon}</span><span>${f.text}</span></div>`).join('');
+
+  // Rank
+  const wins = state.levelResults.filter(r => r.won).length;
+  const newRank = wins >= 5 ? 4 : wins >= 4 ? 3 : wins >= 3 ? 2 : wins >= 2 ? 1 : 0;
+  if (newRank > state.currentRank) {
+    state.currentRank = newRank;
+    const rankEl = document.getElementById('le-rankup');
+    rankEl.style.display = 'block';
+    rankEl.textContent = `🏆 Aufgestiegen: ${state.ranks[state.currentRank]}`;
+  }
+
+  // Next button
+  const nextBtn = document.getElementById('le-next-btn');
+  nextBtn.textContent = state.currentLevel >= state.LEVELS.length - 1 ? 'Finale →' : 'Nächstes Level →';
+}
+
+function nextLevel() {
+  if (state.currentLevel >= state.LEVELS.length - 1) {
+    showFinalScreen();
+  } else {
+    state.currentLevel++;
+    loadLevel(state.currentLevel);
+  }
+}
+
+function retryLevel() {
+  state.levelResults.pop();
+  const rankEl = document.getElementById('le-rankup');
+  if (rankEl) rankEl.style.display = 'none';
+  loadLevel(state.currentLevel);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FINAL SCREEN
+══════════════════════════════════════════════════════════════ */
+function showFinalScreen() {
+  showScreen('final');
+  const wins = state.levelResults.filter(r => r.won).length;
+  const avgTrust = Math.round(state.levelResults.reduce((a, b) => a + b.trust, 0) / state.levelResults.length);
+
+  let rank = wins === 5 ? 'Elite Closer ★' : wins >= 4 ? 'Top Closer' : wins >= 3 ? 'Senior Closer' : wins >= 2 ? 'Performer' : 'Newcomer';
+  document.getElementById('final-rank').textContent = rank;
+
+  const grid = document.getElementById('final-grid');
+  grid.innerHTML = [
+    { val: wins + '/5', label: 'Abschlüsse' },
+    { val: avgTrust, label: 'Ø Vertrauen' },
+    { val: state.totalScore, label: 'Gesamtpunkte' },
+    { val: Math.round(wins/5*100)+'%', label: 'Win-Rate' },
+    { val: `Lvl ${state.playerLevel}`, label: 'Dein XP-Level' },
+    { val: state.xp + ' XP', label: 'Gesamt-XP' }
+  ].map(s => `
+    <div class="final-stat">
+      <span class="final-stat-val" style="${s.val.includes('Lvl') ? 'color:var(--purple)' : ''}">${s.val}</span>
+      <span class="final-stat-label">${s.label}</span>
+    </div>
+  `).join('');
+
+  if (wins === 5) playTone('levelup');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT — Seite geladen
+══════════════════════════════════════════════════════════════ */
+// Environment-Check schon auf Startscreen anzeigen
+document.addEventListener('DOMContentLoaded', () => {
+  // HTTPS & Browser-Check auf Startscreen
+  checkEnvironment();
+
+  // Zeige HTTPS-Warnung auf Startscreen falls nötig
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isSecure) {
+    const warn = document.getElementById('https-warning');
+    if (warn) warn.classList.add('show');
+  }
+});
+</script>
+</body>
+</html>
